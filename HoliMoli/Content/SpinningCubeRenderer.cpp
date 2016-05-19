@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "SpinningCubeRenderer.h"
 #include "Common\DirectXHelper.h"
+#include "Dependencies\Maral\src\maral\bootstraps\bs_pdb_multimodel.hpp"
 
 using namespace HoliMoli;
 using namespace Concurrency;
