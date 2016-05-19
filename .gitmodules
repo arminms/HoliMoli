@@ -1,0 +1,3 @@
+[submodule "HoliMoli/Dependencies/Maral"]
+	path = HoliMoli/Dependencies/Maral
+	url = https://github.com/arminms/maral.git
