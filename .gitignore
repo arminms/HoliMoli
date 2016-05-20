@@ -24,4 +24,8 @@ Debug
 Profile
 Release
 x64
+# NuGet Packages
+*.nupkg
+**/packages/*
+!**/packages/build/
 

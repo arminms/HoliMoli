@@ -99,5 +99,6 @@
   <ItemGroup>
     <None Include="HoliMoli_TemporaryKey.pfx" />
     <None Include="..\README.md" />
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
