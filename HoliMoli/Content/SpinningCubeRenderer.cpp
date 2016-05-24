@@ -1,13 +1,13 @@
 #include "pch.h"
 #include "SpinningCubeRenderer.h"
 #include "Common\DirectXHelper.h"
-#include "Dependencies\Maral\src\maral\bootstraps\bs_pdb_multimodel.hpp"
 
 using namespace HoliMoli;
 using namespace Concurrency;
 using namespace DirectX;
 using namespace Windows::Foundation::Numerics;
 using namespace Windows::UI::Input::Spatial;
+using namespace Windows::Storage;
 
 // Loads vertex and pixel shaders from files and instantiates the cube geometry.
 SpinningCubeRenderer::SpinningCubeRenderer(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
@@ -159,6 +159,31 @@ void SpinningCubeRenderer::Render()
 
 void SpinningCubeRenderer::CreateDeviceDependentResources()
 {
+    // Trying to read a PDB file
+    using namespace Windows::Web::Http;
+    HttpClient^ httpClient = ref new HttpClient();
+    auto getPdbTask = create_task(httpClient->GetStringAsync(
+        ref new Windows::Foundation::Uri(L"http://files.rcsb.org/download/1crn.pdb")))
+    .then([] (task<Platform::String^> task)
+    {
+        using namespace maral;
+        using namespace maral::bootstrap::pdb_multimodel;
+
+        Platform::String^ text = task.get();
+        std::wstring textW(text->Data());
+        //OutputDebugString(textW.c_str());
+        std::string textA(textW.begin(), textW.end());
+        std::istringstream is(textA);
+        auto rt = make<root>();
+        is >> rt;
+        //std::ostringstream os;
+        //os << delimiters('[', ']') << separator(' ')
+        //   << shallow << rt << std::endl;
+        //auto temp = os.str();
+        //std::wstring out(temp.begin(), temp.end());
+        //OutputDebugString(out.c_str());
+    });
+
     m_usingVprtShaders = m_deviceResources->GetDeviceSupportsVprt();
 
     // On devices that do support the D3D11_FEATURE_D3D11_OPTIONS3::
