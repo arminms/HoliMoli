@@ -20,5 +20,4 @@
 #include <map>
 #include <mutex>
 
-#include <boost/lexical_cast.hpp>
 #include "Dependencies\Maral\src\maral\bootstraps\bs_pdb_multimodel.hpp"
