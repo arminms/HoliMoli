@@ -111,8 +111,8 @@ void SpinningMoleculeRenderer::Render()
         DXGI_FORMAT_R16_UINT, // Each index is one 16-bit unsigned integer (short).
         0
         );
-    //context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
-    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+    //context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     context->IASetInputLayout(m_inputLayout.Get());
 
     // Attach the vertex shader.
@@ -126,6 +126,13 @@ void SpinningMoleculeRenderer::Render()
         0,
         1,
         m_modelConstantBuffer.GetAddressOf()
+        );
+
+    // Attach the hull shader.
+    context->HSSetShader(
+        m_hullShader.Get(),
+        nullptr,
+        0
         );
 
     if (!m_usingVprtShaders)
@@ -196,6 +203,7 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
 
     // Load shaders asynchronously.
     task<std::vector<byte>> loadVSTask = DX::ReadDataAsync(vertexShaderFileName);
+    task<std::vector<byte>> loadHSTask = DX::ReadDataAsync(L"ms-appx:///HullShader.cso");
     task<std::vector<byte>> loadPSTask = DX::ReadDataAsync(L"ms-appx:///PixelShader.cso");
 
     task<std::vector<byte>> loadGSTask;
@@ -230,6 +238,19 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
                 &fileData[0],
                 fileData.size(),
                 &m_inputLayout
+                )
+            );
+    });
+
+    // After the hull shader file is loaded, create the shader and input layout.
+    task<void> createHSTask = loadHSTask.then([this] (const std::vector<byte>& fileData)
+    {
+        DX::ThrowIfFailed(
+            m_deviceResources->GetD3DDevice()->CreateHullShader(
+                &fileData[0],
+                fileData.size(),
+                nullptr,
+                &m_hullShader
                 )
             );
     });
