@@ -7,10 +7,10 @@
 namespace HoliMoli
 {
     // This sample renderer instantiates a basic rendering pipeline.
-    class SpinningCubeRenderer
+    class SpinningMoleculeRenderer
     {
     public:
-        SpinningCubeRenderer(const std::shared_ptr<DX::DeviceResources>& deviceResources);
+        SpinningMoleculeRenderer(const std::shared_ptr<DX::DeviceResources>& deviceResources);
         void CreateDeviceDependentResources();
         void ReleaseDeviceDependentResources();
         void Update(const DX::StepTimer& timer);
@@ -42,7 +42,7 @@ namespace HoliMoli
 
         // Variables used with the rendering loop.
         bool                                            m_loadingComplete = false;
-        float                                           m_degreesPerSecond = 45.f;
+        float                                           m_degreesPerSecond = 5.f;
         Windows::Foundation::Numerics::float3           m_position = { 0.f, 0.f, -2.f };
 
         // If the current D3D Device supports VPRT, we can avoid using a geometry

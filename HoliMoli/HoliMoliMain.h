@@ -14,7 +14,7 @@
 #include "Common\StepTimer.h"
 
 #ifdef DRAW_SAMPLE_CONTENT
-#include "Content\SpinningCubeRenderer.h"
+#include "Content\SpinningMoleculeRenderer.h"
 #include "Content\SpatialInputHandler.h"
 #endif
 
@@ -69,7 +69,7 @@ namespace HoliMoli
 #ifdef DRAW_SAMPLE_CONTENT
         // Renders a colorful holographic cube that's 20 centimeters wide. This sample content
         // is used to demonstrate world-locked rendering.
-        std::unique_ptr<SpinningCubeRenderer>                           m_spinningCubeRenderer;
+        std::unique_ptr<SpinningMoleculeRenderer>                           m_spinningCubeRenderer;
 
         // Listens for the Pressed spatial input event.
         std::shared_ptr<SpatialInputHandler>                            m_spatialInputHandler;

@@ -37,7 +37,7 @@ void HoliMoliMain::SetHolographicSpace(HolographicSpace^ holographicSpace)
 
 #ifdef DRAW_SAMPLE_CONTENT
     // Initialize the sample hologram.
-    m_spinningCubeRenderer = std::make_unique<SpinningCubeRenderer>(m_deviceResources);
+    m_spinningCubeRenderer = std::make_unique<SpinningMoleculeRenderer>(m_deviceResources);
 
     m_spatialInputHandler = std::make_unique<SpatialInputHandler>();
 #endif

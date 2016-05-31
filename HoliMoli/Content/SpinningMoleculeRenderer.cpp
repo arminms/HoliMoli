@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "SpinningCubeRenderer.h"
+#include "SpinningMoleculeRenderer.h"
 #include "Common\DirectXHelper.h"
 
 using namespace HoliMoli;
@@ -10,7 +10,7 @@ using namespace Windows::UI::Input::Spatial;
 using namespace Windows::Storage;
 
 // Loads vertex and pixel shaders from files and instantiates the cube geometry.
-SpinningCubeRenderer::SpinningCubeRenderer(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
+SpinningMoleculeRenderer::SpinningMoleculeRenderer(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
     m_deviceResources(deviceResources)
 {
     CreateDeviceDependentResources();
@@ -18,7 +18,7 @@ SpinningCubeRenderer::SpinningCubeRenderer(const std::shared_ptr<DX::DeviceResou
 
 // This function uses a SpatialPointerPose to position the world-locked hologram
 // two meters in front of the user's heading.
-void SpinningCubeRenderer::PositionHologram(SpatialPointerPose^ pointerPose)
+void SpinningMoleculeRenderer::PositionHologram(SpatialPointerPose^ pointerPose)
 {
     if (pointerPose != nullptr)
     {
@@ -38,7 +38,7 @@ void SpinningCubeRenderer::PositionHologram(SpatialPointerPose^ pointerPose)
 
 // Called once per frame. Rotates the cube, and calculates and sets the model matrix
 // relative to the position transform indicated by hologramPositionTransform.
-void SpinningCubeRenderer::Update(const DX::StepTimer& timer)
+void SpinningMoleculeRenderer::Update(const DX::StepTimer& timer)
 {
     // Rotate the cube.
     // Convert degrees to radians, then convert seconds to rotation angle.
@@ -86,7 +86,7 @@ void SpinningCubeRenderer::Update(const DX::StepTimer& timer)
 // VPAndRTArrayIndexFromAnyShaderFeedingRasterizer optional feature,
 // a pass-through geometry shader is also used to set the render 
 // target array index.
-void SpinningCubeRenderer::Render()
+void SpinningMoleculeRenderer::Render()
 {
     // Loading is asynchronous. Resources must be created before drawing can occur.
     if (!m_loadingComplete)
@@ -111,6 +111,7 @@ void SpinningCubeRenderer::Render()
         DXGI_FORMAT_R16_UINT, // Each index is one 16-bit unsigned integer (short).
         0
         );
+    //context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     context->IASetInputLayout(m_inputLayout.Get());
 
@@ -157,7 +158,7 @@ void SpinningCubeRenderer::Render()
         );
 }
 
-void SpinningCubeRenderer::CreateDeviceDependentResources()
+void SpinningMoleculeRenderer::CreateDeviceDependentResources()
 {
     // Trying to read a PDB file
     using namespace Windows::Web::Http;
@@ -332,6 +333,15 @@ void SpinningCubeRenderer::CreateDeviceDependentResources()
             1,7,5,
         };
 
+        //static const unsigned short cubeIndices [] =
+        //{
+        //    0,1,1,2,2,3,3,0,
+
+        //    4,5,5,6,6,7,7,4,
+
+        //    0,4,1,5,2,6,3,7,
+        //};
+
         m_indexCount = ARRAYSIZE(cubeIndices);
 
         D3D11_SUBRESOURCE_DATA indexBufferData = {0};
@@ -355,7 +365,7 @@ void SpinningCubeRenderer::CreateDeviceDependentResources()
     });
 }
 
-void SpinningCubeRenderer::ReleaseDeviceDependentResources()
+void SpinningMoleculeRenderer::ReleaseDeviceDependentResources()
 {
     m_loadingComplete  = false;
     m_usingVprtShaders = false;

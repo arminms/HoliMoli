@@ -39,10 +39,10 @@
     <ClCompile Include="Content\SpatialInputHandler.cpp">
       <Filter>Content</Filter>
     </ClCompile>
-    <ClCompile Include="Content\SpinningCubeRenderer.cpp">
+    <ClCompile Include="HoliMoliMain.cpp" />
+    <ClCompile Include="Content\SpinningMoleculeRenderer.cpp">
       <Filter>Content</Filter>
     </ClCompile>
-    <ClCompile Include="HoliMoliMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -50,13 +50,13 @@
     <ClInclude Include="Content\SpatialInputHandler.h">
       <Filter>Content</Filter>
     </ClInclude>
-    <ClInclude Include="Content\SpinningCubeRenderer.h">
-      <Filter>Content</Filter>
-    </ClInclude>
     <ClInclude Include="Content\ShaderStructures.h">
       <Filter>Content</Filter>
     </ClInclude>
     <ClInclude Include="HoliMoliMain.h" />
+    <ClInclude Include="Content\SpinningMoleculeRenderer.h">
+      <Filter>Content</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Content\VertexShader.hlsl">
