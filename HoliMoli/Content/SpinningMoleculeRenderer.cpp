@@ -111,8 +111,8 @@ void SpinningMoleculeRenderer::Render()
         DXGI_FORMAT_R16_UINT, // Each index is one 16-bit unsigned integer (short).
         0
         );
-    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-    //context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    //context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     context->IASetInputLayout(m_inputLayout.Get());
 
     // Attach the vertex shader.
@@ -128,12 +128,19 @@ void SpinningMoleculeRenderer::Render()
         m_modelConstantBuffer.GetAddressOf()
         );
 
-    // Attach the hull shader.
-    context->HSSetShader(
-        m_hullShader.Get(),
-        nullptr,
-        0
-        );
+    //// Attach the hull shader.
+    //context->HSSetShader(
+    //    m_hullShader.Get(),
+    //    nullptr,
+    //    0
+    //    );
+
+    //// Attach the domain shader.
+    //context->DSSetShader(
+    //    m_domainShader.Get(),
+    //    nullptr,
+    //    0
+    //    );
 
     if (!m_usingVprtShaders)
     {
@@ -203,7 +210,8 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
 
     // Load shaders asynchronously.
     task<std::vector<byte>> loadVSTask = DX::ReadDataAsync(vertexShaderFileName);
-    task<std::vector<byte>> loadHSTask = DX::ReadDataAsync(L"ms-appx:///HullShader.cso");
+    //task<std::vector<byte>> loadHSTask = DX::ReadDataAsync(L"ms-appx:///HullShader.cso");
+    //task<std::vector<byte>> loadDSTask = DX::ReadDataAsync(L"ms-appx:///DomainShader.cso");
     task<std::vector<byte>> loadPSTask = DX::ReadDataAsync(L"ms-appx:///PixelShader.cso");
 
     task<std::vector<byte>> loadGSTask;
@@ -242,18 +250,31 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
             );
     });
 
-    // After the hull shader file is loaded, create the shader and input layout.
-    task<void> createHSTask = loadHSTask.then([this] (const std::vector<byte>& fileData)
-    {
-        DX::ThrowIfFailed(
-            m_deviceResources->GetD3DDevice()->CreateHullShader(
-                &fileData[0],
-                fileData.size(),
-                nullptr,
-                &m_hullShader
-                )
-            );
-    });
+    //// After the hull shader file is loaded, create the shader and input layout.
+    //task<void> createHSTask = loadHSTask.then([this] (const std::vector<byte>& fileData)
+    //{
+    //    DX::ThrowIfFailed(
+    //        m_deviceResources->GetD3DDevice()->CreateHullShader(
+    //            &fileData[0],
+    //            fileData.size(),
+    //            nullptr,
+    //            &m_hullShader
+    //            )
+    //        );
+    //});
+
+    //// After the domain shader file is loaded, create the shader and input layout.
+    //task<void> createDSTask = loadDSTask.then([this] (const std::vector<byte>& fileData)
+    //{
+    //    DX::ThrowIfFailed(
+    //        m_deviceResources->GetD3DDevice()->CreateDomainShader(
+    //            &fileData[0],
+    //            fileData.size(),
+    //            nullptr,
+    //            &m_domainShader
+    //            )
+    //        );
+    //});
 
     // After the pixel shader file is loaded, create the shader and constant buffer.
     task<void> createPSTask = loadPSTask.then([this] (const std::vector<byte>& fileData)
@@ -356,11 +377,7 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
 
         //static const unsigned short cubeIndices [] =
         //{
-        //    0,1,1,2,2,3,3,0,
-
-        //    4,5,5,6,6,7,7,4,
-
-        //    0,4,1,5,2,6,3,7,
+        //    0,1,2,3,4,5,6,7,
         //};
 
         m_indexCount = ARRAYSIZE(cubeIndices);

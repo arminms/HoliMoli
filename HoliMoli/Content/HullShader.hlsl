@@ -1,13 +1,17 @@
 // Input control point
 struct VS_CONTROL_POINT_OUTPUT
 {
-    float3 vPosition : WORLDPOS;
+    min16float4 pos     : SV_POSITION;
+    min16float3 color   : COLOR0;
+    uint instId         : TEXCOORD0;
 };
 
 // Output control point
 struct HS_CONTROL_POINT_OUTPUT
 {
-    float3 vPosition : WORLDPOS; 
+    min16float4 pos     : SV_POSITION;
+    min16float3 color   : COLOR0;
+    uint instId         : TEXCOORD0;
 };
 
 // Output patch constant data.
@@ -24,16 +28,16 @@ HS_CONSTANT_DATA_OUTPUT CalcHSPatchConstants(
     InputPatch<VS_CONTROL_POINT_OUTPUT, NUM_CONTROL_POINTS> ip,
     uint PatchID : SV_PrimitiveID)
 {
-    HS_CONSTANT_DATA_OUTPUT Output;
+    HS_CONSTANT_DATA_OUTPUT output;
 
-    Output.EdgeTessFactor[0] =
-        Output.EdgeTessFactor[1] =
-        Output.EdgeTessFactor[2] = 
-        Output.EdgeTessFactor[3] =
-        Output.InsideTessFactor[0] = 
-        Output.InsideTessFactor[1] = 5; // calculate dynamic tessellation factors later
+    output.EdgeTessFactor[0] =
+        output.EdgeTessFactor[1] =
+        output.EdgeTessFactor[2] = 
+        output.EdgeTessFactor[3] =
+        output.InsideTessFactor[0] = 
+        output.InsideTessFactor[1] = 5; // calculate dynamic tessellation factors later
 
-    return Output;
+    return output;
 }
 
 [domain("quad")]
@@ -46,9 +50,11 @@ HS_CONTROL_POINT_OUTPUT main(
     uint i : SV_OutputControlPointID,
     uint PatchID : SV_PrimitiveID )
 {
-    HS_CONTROL_POINT_OUTPUT Output;
+    HS_CONTROL_POINT_OUTPUT output;
 
-    Output.vPosition = ip[i].vPosition;
+    output.pos    = ip[i].pos;
+    output.color  = ip[i].color;
+    output.instId = ip[i].instId;
 
-    return Output;
+    return output;
 }
