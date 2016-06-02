@@ -46,6 +46,8 @@ namespace HoliMoli
         bool                                            m_loadingComplete = false;
         float                                           m_degreesPerSecond = 5.f;
         Windows::Foundation::Numerics::float3           m_position = { 0.f, 0.f, -2.f };
+        //Windows::Foundation::Numerics::float3           m_position = { 0.9837f, 0.8018f, 0.8904f };
+
 
         // If the current D3D Device supports VPRT, we can avoid using a geometry
         // shader just to set the render target array index

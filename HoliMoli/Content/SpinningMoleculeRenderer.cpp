@@ -170,41 +170,48 @@ void SpinningMoleculeRenderer::Render()
         );
 
     // Draw the objects.
-    context->DrawIndexedInstanced(
-        m_indexCount,   // Index count per instance.
-        2,              // Instance count.
-        0,              // Start index location.
-        0,              // Base vertex location.
-        0               // Start instance location.
-        );
+    context->DrawInstanced(
+        m_indexCount    // Index count per instance
+    ,   2               // Instance count
+    ,   0               // Start vertex location
+    ,   0               // Start instance location
+    );
+
+    //context->DrawIndexedInstanced(
+    //    m_indexCount,   // Index count per instance.
+    //    2,              // Instance count.
+    //    0,              // Start index location.
+    //    0,              // Base vertex location.
+    //    0               // Start instance location.
+    //    );
 }
 
 void SpinningMoleculeRenderer::CreateDeviceDependentResources()
 {
     // Trying to read a PDB file
-    using namespace Windows::Web::Http;
-    HttpClient^ httpClient = ref new HttpClient();
-    auto getPdbTask = create_task(httpClient->GetStringAsync(
-        ref new Windows::Foundation::Uri(L"http://files.rcsb.org/download/1crn.pdb")))
-    .then([] (task<Platform::String^> task)
-    {
-        using namespace maral;
-        using namespace maral::bootstrap::pdb_multimodel;
+    //using namespace Windows::Web::Http;
+    //HttpClient^ httpClient = ref new HttpClient();
+    //auto getPdbTask = create_task(httpClient->GetStringAsync(
+    //    ref new Windows::Foundation::Uri(L"http://files.rcsb.org/download/1crn.pdb")))
+    //.then([] (task<Platform::String^> task)
+    //{
+    //    using namespace maral;
+    //    using namespace maral::bootstrap::pdb_multimodel;
 
-        Platform::String^ text = task.get();
-        std::wstring textW(text->Data());
-        //OutputDebugString(textW.c_str());
-        std::string textA(textW.begin(), textW.end());
-        std::istringstream is(textA);
-        auto rt = make<root>();
-        is >> rt;
-        //std::ostringstream os;
-        //os << delimiters('[', ']') << separator(' ')
-        //   << shallow << rt << std::endl;
-        //auto temp = os.str();
-        //std::wstring out(temp.begin(), temp.end());
-        //OutputDebugString(out.c_str());
-    });
+    //    Platform::String^ text = task.get();
+    //    std::wstring textW(text->Data());
+    //    //OutputDebugString(textW.c_str());
+    //    std::string textA(textW.begin(), textW.end());
+    //    std::istringstream is(textA);
+    //    auto rt = make<root>();
+    //    is >> rt;
+    //    //std::ostringstream os;
+    //    //os << delimiters('[', ']') << separator(' ')
+    //    //   << shallow << rt << std::endl;
+    //    //auto temp = os.str();
+    //    //std::wstring out(temp.begin(), temp.end());
+    //    //OutputDebugString(out.c_str());
+    //});
 
     m_usingVprtShaders = m_deviceResources->GetDeviceSupportsVprt();
 
@@ -323,84 +330,150 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
     }
 
     // Once all shaders are loaded, create the mesh.
-    task<void> shaderTaskGroup = m_usingVprtShaders ? (createPSTask && createVSTask) : (createPSTask && createVSTask && createGSTask);
+    task<void> shaderTaskGroup
+        =  m_usingVprtShaders
+        ? (createPSTask && createDSTask && createHSTask && createVSTask)
+        : (createPSTask && createGSTask && createDSTask && createHSTask && createVSTask);
+
     task<void> createMoleculeTask  = shaderTaskGroup.then([this] ()
     {
-        // Load mesh vertices. Each vertex has a position and a color.
-        // Note that the molecule size has changed from the default DirectX app
-        // template. Windows Holographic is scaled in meters, so to draw the
-        // molecule at a comfortable size we made the molecule width 0.2 m (20 cm).
-        static const VertexPositionColor moleculeVertices[] =
+        using namespace Windows::Web::Http;
+        using namespace maral;
+        using namespace maral::bootstrap::pdb_multimodel;
+
+        HttpClient^ httpClient = ref new HttpClient();
+        auto getPdbTask = create_task(httpClient->GetStringAsync(
+            ref new Windows::Foundation::Uri(L"http://files.rcsb.org/download/1crn.pdb")))
+        .then([this] (task<Platform::String^> task)
         {
-            { XMFLOAT3(-0.1f, -0.1f, -0.1f), XMFLOAT3(0.5f, 0.5f, 0.5f) },
-            { XMFLOAT3(-0.1f, -0.1f,  0.1f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-            { XMFLOAT3(-0.1f,  0.1f, -0.1f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-            { XMFLOAT3(-0.1f,  0.1f,  0.1f), XMFLOAT3(0.0f, 1.0f, 1.0f) },
-            { XMFLOAT3( 0.1f, -0.1f, -0.1f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
-            { XMFLOAT3( 0.1f, -0.1f,  0.1f), XMFLOAT3(1.0f, 0.0f, 1.0f) },
-            { XMFLOAT3( 0.1f,  0.1f, -0.1f), XMFLOAT3(1.0f, 1.0f, 0.0f) },
-            { XMFLOAT3( 0.1f,  0.1f,  0.1f), XMFLOAT3(1.0f, 1.0f, 1.0f) },
-        };
 
-        D3D11_SUBRESOURCE_DATA vertexBufferData = {0};
-        vertexBufferData.pSysMem = moleculeVertices;
-        vertexBufferData.SysMemPitch = 0;
-        vertexBufferData.SysMemSlicePitch = 0;
-        const CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(moleculeVertices), D3D11_BIND_VERTEX_BUFFER);
-        DX::ThrowIfFailed(
-            m_deviceResources->GetD3DDevice()->CreateBuffer(
-                &vertexBufferDesc,
-                &vertexBufferData,
-                &m_vertexBuffer
-                )
-            );
+            Platform::String^ text = task.get();
+            std::wstring textW(text->Data());
+            std::string textA(textW.begin(), textW.end());
+            std::istringstream is(textA);
+            auto rt = make<root>();
+            is >> rt;
+            std::size_t atomsCount = boost::distance(rt->range<atom>());
+            std::vector<VertexPositionColor> moleculeVertices(atomsCount);
 
-        // Load mesh indices. Each trio of indices represents
-        // a triangle to be rendered on the screen.
-        // For example: 2,1,0 means that the vertices with indexes
-        // 2, 1, and 0 from the vertex buffer compose the
-        // first triangle of this mesh.
-        // Note that the winding order is clockwise by default.
-        //static const unsigned short moleculeIndices [] =
-        //{
-        //    2,1,0, // -x
-        //    2,3,1,
+            mtl::point3f min, max;
+            min.zero(); max.zero();
+            for (auto atm : rt->range<atom>())
+            {
+                mtl::minimize(min, min, atm->center());
+                mtl::maximize(max, max, atm->center());
+            }
+            mtl::point3f center;
+            mtl::middle(center, min, max);
+            center.x() *= 0.1f;
+            center.y() *= 0.1f;
+            center.z() *= 0.1f;
 
-        //    6,4,5, // +x
-        //    6,5,7,
+            auto atm = rt->begin<atom>();
+            for (std::size_t i = 0; i < atomsCount; ++i, ++atm)
+            {
+                auto pos = atm->center();
+                pos.x() *= 0.1f;
+                pos.y() *= 0.1f;
+                pos.z() *= 0.1f;
+                pos += mtl::vector3f(center, mtl::point3f(0.f, 0.f, -2.f));
+                moleculeVertices[i].pos.x = pos.x();
+                moleculeVertices[i].pos.y = pos.y();
+                moleculeVertices[i].pos.z = pos.z();
+                if (atm->atomic_number() == 6)
+                    moleculeVertices[i].color = XMFLOAT3(0.5f, 0.5f, 0.5f);
+                else if (atm->atomic_number() == 7)
+                    moleculeVertices[i].color = XMFLOAT3(0.0f, 0.0f, 1.0f);
+                else if (atm->atomic_number() == 8)
+                    moleculeVertices[i].color = XMFLOAT3(1.0f, 0.0f, 0.0f);
+                else
+                    moleculeVertices[i].color = XMFLOAT3(1.0f, 1.0f, 0.0f);
+            }
 
-        //    0,1,5, // -y
-        //    0,5,4,
+            //// Load mesh vertices. Each vertex has a position and a color.
+            //// Note that the molecule size has changed from the default DirectX app
+            //// template. Windows Holographic is scaled in meters, so to draw the
+            //// molecule at a comfortable size we made the molecule width 0.2 m (20 cm).
+            //static const VertexPositionColor moleculeVertices[] =
+            //{
+            //    { XMFLOAT3(-0.1f, -0.1f, -0.1f), XMFLOAT3(0.5f, 0.5f, 0.5f) },
+            //    { XMFLOAT3(-0.1f, -0.1f,  0.1f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+            //    { XMFLOAT3(-0.1f,  0.1f, -0.1f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+            //    { XMFLOAT3(-0.1f,  0.1f,  0.1f), XMFLOAT3(0.0f, 1.0f, 1.0f) },
+            //    { XMFLOAT3( 0.1f, -0.1f, -0.1f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
+            //    { XMFLOAT3( 0.1f, -0.1f,  0.1f), XMFLOAT3(1.0f, 0.0f, 1.0f) },
+            //    { XMFLOAT3( 0.1f,  0.1f, -0.1f), XMFLOAT3(1.0f, 1.0f, 0.0f) },
+            //    { XMFLOAT3( 0.1f,  0.1f,  0.1f), XMFLOAT3(1.0f, 1.0f, 1.0f) },
+            //};
 
-        //    2,6,7, // +y
-        //    2,7,3,
+            D3D11_SUBRESOURCE_DATA vertexBufferData = {0};
+            //vertexBufferData.pSysMem = moleculeVertices;
+            vertexBufferData.pSysMem = moleculeVertices.data();
+            vertexBufferData.SysMemPitch = 0;
+            vertexBufferData.SysMemSlicePitch = 0;
+            //const CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(moleculeVertices), D3D11_BIND_VERTEX_BUFFER);
+            const CD3D11_BUFFER_DESC vertexBufferDesc(moleculeVertices.size() * sizeof(VertexPositionColor), D3D11_BIND_VERTEX_BUFFER);
+            DX::ThrowIfFailed(
+                m_deviceResources->GetD3DDevice()->CreateBuffer(
+                    &vertexBufferDesc,
+                    &vertexBufferData,
+                    &m_vertexBuffer
+                    )
+                );
 
-        //    0,4,6, // -z
-        //    0,6,2,
+            // Load mesh indices. Each trio of indices represents
+            // a triangle to be rendered on the screen.
+            // For example: 2,1,0 means that the vertices with indexes
+            // 2, 1, and 0 from the vertex buffer compose the
+            // first triangle of this mesh.
+            // Note that the winding order is clockwise by default.
+            //static const unsigned short moleculeIndices [] =
+            //{
+            //    2,1,0, // -x
+            //    2,3,1,
 
-        //    1,3,7, // +z
-        //    1,7,5,
-        //};
+            //    6,4,5, // +x
+            //    6,5,7,
 
-        static const unsigned short moleculeIndices [] =
-        {
-            0,1,2,3,4,5,6,7,
-        };
+            //    0,1,5, // -y
+            //    0,5,4,
 
-        m_indexCount = ARRAYSIZE(moleculeIndices);
+            //    2,6,7, // +y
+            //    2,7,3,
 
-        D3D11_SUBRESOURCE_DATA indexBufferData = {0};
-        indexBufferData.pSysMem          = moleculeIndices;
-        indexBufferData.SysMemPitch      = 0;
-        indexBufferData.SysMemSlicePitch = 0;
-        const CD3D11_BUFFER_DESC indexBufferDesc(sizeof(moleculeIndices), D3D11_BIND_INDEX_BUFFER);
-        DX::ThrowIfFailed(
-            m_deviceResources->GetD3DDevice()->CreateBuffer(
-                &indexBufferDesc,
-                &indexBufferData,
-                &m_indexBuffer
-                )
-            );
+            //    0,4,6, // -z
+            //    0,6,2,
+
+            //    1,3,7, // +z
+            //    1,7,5,
+            //};
+
+            ////static const unsigned short moleculeIndices [] =
+            ////{
+            ////    0,1,2,3,4,5,6,7,
+            ////};
+            //std::vector<unsigned short> moleculeIndices(moleculeVertices.size());
+            //std::iota(moleculeIndices.begin(), moleculeIndices.end(), 0);
+
+            ////m_indexCount = ARRAYSIZE(moleculeIndices);
+            ////m_indexCount = moleculeIndices.size();
+            m_indexCount = moleculeVertices.size();
+
+            //D3D11_SUBRESOURCE_DATA indexBufferData = {0};
+            ////indexBufferData.pSysMem          = moleculeIndices;
+            //indexBufferData.pSysMem          = moleculeIndices.data();
+            //indexBufferData.SysMemPitch      = 0;
+            //indexBufferData.SysMemSlicePitch = 0;
+            ////const CD3D11_BUFFER_DESC indexBufferDesc(sizeof(moleculeIndices), D3D11_BIND_INDEX_BUFFER);
+            //const CD3D11_BUFFER_DESC indexBufferDesc(moleculeIndices.size() * sizeof(unsigned short), D3D11_BIND_INDEX_BUFFER);
+            //DX::ThrowIfFailed(
+            //    m_deviceResources->GetD3DDevice()->CreateBuffer(
+            //        &indexBufferDesc,
+            //        &indexBufferData,
+            //        &m_indexBuffer
+            //        )
+            //    );
+        });
     });
 
     // Once the molecule is loaded, the object is ready to be rendered.

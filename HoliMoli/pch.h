@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <numeric>
 
 #include <agile.h>
 #include <concrt.h>
