@@ -23,7 +23,7 @@ struct VertexShaderInput
 // using the value of viewId.
 struct VertexShaderOutput
 {
-    min16float4 pos     : SV_POSITION;
+    min16float4 pos     : POSITION; // SV_POSITION
     min16float3 color   : COLOR0;
     uint        viewId  : TEXCOORD0;  // SV_InstanceID % 2
 };
@@ -41,10 +41,10 @@ VertexShaderOutput main(VertexShaderInput input)
     int idx = input.instId % 2;
 
     // Transform the vertex position into world space.
-    pos = mul(pos, model);
+    //pos = mul(pos, model);
 
     // Correct for perspective and project the vertex position onto the screen.
-    pos = mul(pos, viewProjection[idx]);
+    //pos = mul(pos, viewProjection[idx]);
     output.pos = (min16float4)pos;
 
     // Pass the color through without modification.

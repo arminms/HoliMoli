@@ -111,8 +111,8 @@ void SpinningMoleculeRenderer::Render()
         DXGI_FORMAT_R16_UINT, // Each index is one 16-bit unsigned integer (short).
         0
         );
-    //context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST);
+    //context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     context->IASetInputLayout(m_inputLayout.Get());
 
     // Attach the vertex shader.
@@ -128,19 +128,26 @@ void SpinningMoleculeRenderer::Render()
         m_modelConstantBuffer.GetAddressOf()
         );
 
-    //// Attach the hull shader.
-    //context->HSSetShader(
-    //    m_hullShader.Get(),
-    //    nullptr,
-    //    0
-    //    );
+    // Attach the hull shader.
+    context->HSSetShader(
+        m_hullShader.Get(),
+        nullptr,
+        0
+        );
 
-    //// Attach the domain shader.
-    //context->DSSetShader(
-    //    m_domainShader.Get(),
-    //    nullptr,
-    //    0
-    //    );
+    // Attach the domain shader.
+    context->DSSetShader(
+        m_domainShader.Get(),
+        nullptr,
+        0
+        );
+
+    // Apply the model constant buffer to the domain shader.
+    context->DSSetConstantBuffers(
+        0,
+        1,
+        m_modelConstantBuffer.GetAddressOf()
+        );
 
     if (!m_usingVprtShaders)
     {
@@ -210,8 +217,8 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
 
     // Load shaders asynchronously.
     task<std::vector<byte>> loadVSTask = DX::ReadDataAsync(vertexShaderFileName);
-    //task<std::vector<byte>> loadHSTask = DX::ReadDataAsync(L"ms-appx:///HullShader.cso");
-    //task<std::vector<byte>> loadDSTask = DX::ReadDataAsync(L"ms-appx:///DomainShader.cso");
+    task<std::vector<byte>> loadHSTask = DX::ReadDataAsync(L"ms-appx:///HullShader.cso");
+    task<std::vector<byte>> loadDSTask = DX::ReadDataAsync(L"ms-appx:///DomainShader.cso");
     task<std::vector<byte>> loadPSTask = DX::ReadDataAsync(L"ms-appx:///PixelShader.cso");
 
     task<std::vector<byte>> loadGSTask;
@@ -250,31 +257,31 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
             );
     });
 
-    //// After the hull shader file is loaded, create the shader and input layout.
-    //task<void> createHSTask = loadHSTask.then([this] (const std::vector<byte>& fileData)
-    //{
-    //    DX::ThrowIfFailed(
-    //        m_deviceResources->GetD3DDevice()->CreateHullShader(
-    //            &fileData[0],
-    //            fileData.size(),
-    //            nullptr,
-    //            &m_hullShader
-    //            )
-    //        );
-    //});
+    // After the hull shader file is loaded, create the shader and input layout.
+    task<void> createHSTask = loadHSTask.then([this] (const std::vector<byte>& fileData)
+    {
+        DX::ThrowIfFailed(
+            m_deviceResources->GetD3DDevice()->CreateHullShader(
+                &fileData[0],
+                fileData.size(),
+                nullptr,
+                &m_hullShader
+                )
+            );
+    });
 
-    //// After the domain shader file is loaded, create the shader and input layout.
-    //task<void> createDSTask = loadDSTask.then([this] (const std::vector<byte>& fileData)
-    //{
-    //    DX::ThrowIfFailed(
-    //        m_deviceResources->GetD3DDevice()->CreateDomainShader(
-    //            &fileData[0],
-    //            fileData.size(),
-    //            nullptr,
-    //            &m_domainShader
-    //            )
-    //        );
-    //});
+    // After the domain shader file is loaded, create the shader and input layout.
+    task<void> createDSTask = loadDSTask.then([this] (const std::vector<byte>& fileData)
+    {
+        DX::ThrowIfFailed(
+            m_deviceResources->GetD3DDevice()->CreateDomainShader(
+                &fileData[0],
+                fileData.size(),
+                nullptr,
+                &m_domainShader
+                )
+            );
+    });
 
     // After the pixel shader file is loaded, create the shader and constant buffer.
     task<void> createPSTask = loadPSTask.then([this] (const std::vector<byte>& fileData)
@@ -325,14 +332,16 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
         // cube at a comfortable size we made the cube width 0.2 m (20 cm).
         static const VertexPositionColor cubeVertices[] =
         {
-            { XMFLOAT3(-0.1f, -0.1f, -0.1f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-            { XMFLOAT3(-0.1f, -0.1f,  0.1f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-            { XMFLOAT3(-0.1f,  0.1f, -0.1f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-            { XMFLOAT3(-0.1f,  0.1f,  0.1f), XMFLOAT3(0.0f, 1.0f, 1.0f) },
-            { XMFLOAT3( 0.1f, -0.1f, -0.1f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
-            { XMFLOAT3( 0.1f, -0.1f,  0.1f), XMFLOAT3(1.0f, 0.0f, 1.0f) },
-            { XMFLOAT3( 0.1f,  0.1f, -0.1f), XMFLOAT3(1.0f, 1.0f, 0.0f) },
-            { XMFLOAT3( 0.1f,  0.1f,  0.1f), XMFLOAT3(1.0f, 1.0f, 1.0f) },
+            { XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
+
+            //{ XMFLOAT3(-0.1f, -0.1f, -0.1f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
+            //{ XMFLOAT3(-0.1f, -0.1f,  0.1f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+            //{ XMFLOAT3(-0.1f,  0.1f, -0.1f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+            //{ XMFLOAT3(-0.1f,  0.1f,  0.1f), XMFLOAT3(0.0f, 1.0f, 1.0f) },
+            //{ XMFLOAT3( 0.1f, -0.1f, -0.1f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
+            //{ XMFLOAT3( 0.1f, -0.1f,  0.1f), XMFLOAT3(1.0f, 0.0f, 1.0f) },
+            //{ XMFLOAT3( 0.1f,  0.1f, -0.1f), XMFLOAT3(1.0f, 1.0f, 0.0f) },
+            //{ XMFLOAT3( 0.1f,  0.1f,  0.1f), XMFLOAT3(1.0f, 1.0f, 1.0f) },
         };
 
         D3D11_SUBRESOURCE_DATA vertexBufferData = {0};
@@ -354,31 +363,31 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
         // 2, 1, and 0 from the vertex buffer compose the
         // first triangle of this mesh.
         // Note that the winding order is clockwise by default.
-        static const unsigned short cubeIndices [] =
-        {
-            2,1,0, // -x
-            2,3,1,
-
-            6,4,5, // +x
-            6,5,7,
-
-            0,1,5, // -y
-            0,5,4,
-
-            2,6,7, // +y
-            2,7,3,
-
-            0,4,6, // -z
-            0,6,2,
-
-            1,3,7, // +z
-            1,7,5,
-        };
-
         //static const unsigned short cubeIndices [] =
         //{
-        //    0,1,2,3,4,5,6,7,
+        //    2,1,0, // -x
+        //    2,3,1,
+
+        //    6,4,5, // +x
+        //    6,5,7,
+
+        //    0,1,5, // -y
+        //    0,5,4,
+
+        //    2,6,7, // +y
+        //    2,7,3,
+
+        //    0,4,6, // -z
+        //    0,6,2,
+
+        //    1,3,7, // +z
+        //    1,7,5,
         //};
+
+        static const unsigned short cubeIndices [] =
+        {
+            0,
+        };
 
         m_indexCount = ARRAYSIZE(cubeIndices);
 

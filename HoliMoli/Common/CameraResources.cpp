@@ -255,6 +255,13 @@ bool DX::CameraResources::AttachViewProjectionBuffer(
         m_viewProjectionConstantBuffer.GetAddressOf()
         );
 
+    // Send the constant buffer to the domain shader.
+    context->DSSetConstantBuffers(
+        1,
+        1,
+        m_viewProjectionConstantBuffer.GetAddressOf()
+        );
+
     // The template includes a pass-through geometry shader that is used by
     // default on systems that don't support the D3D11_FEATURE_D3D11_OPTIONS3::
     // VPAndRTArrayIndexFromAnyShaderFeedingRasterizer extension. The shader 
