@@ -37,7 +37,7 @@ void HoliMoliMain::SetHolographicSpace(HolographicSpace^ holographicSpace)
 
 #ifdef DRAW_SAMPLE_CONTENT
     // Initialize the sample hologram.
-    m_spinningCubeRenderer = std::make_unique<SpinningMoleculeRenderer>(m_deviceResources);
+    m_spinningMoleculeRenderer = std::make_unique<SpinningMoleculeRenderer>(m_deviceResources);
 
     m_spatialInputHandler = std::make_unique<SpatialInputHandler>();
 #endif
@@ -159,7 +159,7 @@ HolographicFrame^ HoliMoliMain::Update()
     {
         // When a Pressed gesture is detected, the sample hologram will be repositioned
         // two meters in front of the user.
-        m_spinningCubeRenderer->PositionHologram(
+        m_spinningMoleculeRenderer->PositionHologram(
             pointerState->TryGetPointerPose(currentCoordinateSystem)
             );
     }
@@ -176,7 +176,7 @@ HolographicFrame^ HoliMoliMain::Update()
         //
 
 #ifdef DRAW_SAMPLE_CONTENT
-        m_spinningCubeRenderer->Update(m_timer);
+        m_spinningMoleculeRenderer->Update(m_timer);
 #endif
     });
 
@@ -200,7 +200,7 @@ HolographicFrame^ HoliMoliMain::Update()
         // hologram is at a fixed point so we only need to indicate its position.
         renderingParameters->SetFocusPoint(
             currentCoordinateSystem,
-            m_spinningCubeRenderer->GetPosition()
+            m_spinningMoleculeRenderer->GetPosition()
             );
 #endif
     }
@@ -288,7 +288,7 @@ bool HoliMoliMain::Render(Windows::Graphics::Holographic::HolographicFrame^ holo
             if (cameraActive)
             {
                 // Draw the sample hologram.
-                m_spinningCubeRenderer->Render();
+                m_spinningMoleculeRenderer->Render();
             }
 #endif
             atLeastOneCameraRendered = true;
@@ -323,7 +323,7 @@ void HoliMoliMain::LoadAppState()
 void HoliMoliMain::OnDeviceLost()
 {
 #ifdef DRAW_SAMPLE_CONTENT
-    m_spinningCubeRenderer->ReleaseDeviceDependentResources();
+    m_spinningMoleculeRenderer->ReleaseDeviceDependentResources();
 #endif
 }
 
@@ -332,7 +332,7 @@ void HoliMoliMain::OnDeviceLost()
 void HoliMoliMain::OnDeviceRestored()
 {
 #ifdef DRAW_SAMPLE_CONTENT
-    m_spinningCubeRenderer->CreateDeviceDependentResources();
+    m_spinningMoleculeRenderer->CreateDeviceDependentResources();
 #endif
 }
 

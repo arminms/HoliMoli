@@ -9,7 +9,7 @@ using namespace Windows::Foundation::Numerics;
 using namespace Windows::UI::Input::Spatial;
 using namespace Windows::Storage;
 
-// Loads vertex and pixel shaders from files and instantiates the cube geometry.
+// Loads vertex and pixel shaders from files and instantiates the molecule geometry.
 SpinningMoleculeRenderer::SpinningMoleculeRenderer(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
     m_deviceResources(deviceResources)
 {
@@ -36,18 +36,18 @@ void SpinningMoleculeRenderer::PositionHologram(SpatialPointerPose^ pointerPose)
     }
 }
 
-// Called once per frame. Rotates the cube, and calculates and sets the model matrix
+// Called once per frame. Rotates the molecule, and calculates and sets the model matrix
 // relative to the position transform indicated by hologramPositionTransform.
 void SpinningMoleculeRenderer::Update(const DX::StepTimer& timer)
 {
-    // Rotate the cube.
+    // Rotate the molecule.
     // Convert degrees to radians, then convert seconds to rotation angle.
     const float    radiansPerSecond = XMConvertToRadians(m_degreesPerSecond);
     const double   totalRotation    = timer.GetTotalSeconds() * radiansPerSecond;
     const float    radians          = static_cast<float>(fmod(totalRotation, XM_2PI));
     const XMMATRIX modelRotation    = XMMatrixRotationY(-radians);
 
-    // Position the cube.
+    // Position the molecule.
     const XMMATRIX modelTranslation = XMMatrixTranslationFromVector(XMLoadFloat3(&m_position));
 
     // Multiply to get the transform matrix.
@@ -324,31 +324,29 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
 
     // Once all shaders are loaded, create the mesh.
     task<void> shaderTaskGroup = m_usingVprtShaders ? (createPSTask && createVSTask) : (createPSTask && createVSTask && createGSTask);
-    task<void> createCubeTask  = shaderTaskGroup.then([this] ()
+    task<void> createMoleculeTask  = shaderTaskGroup.then([this] ()
     {
         // Load mesh vertices. Each vertex has a position and a color.
-        // Note that the cube size has changed from the default DirectX app
+        // Note that the molecule size has changed from the default DirectX app
         // template. Windows Holographic is scaled in meters, so to draw the
-        // cube at a comfortable size we made the cube width 0.2 m (20 cm).
-        static const VertexPositionColor cubeVertices[] =
+        // molecule at a comfortable size we made the molecule width 0.2 m (20 cm).
+        static const VertexPositionColor moleculeVertices[] =
         {
-            { XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
-
-            //{ XMFLOAT3(-0.1f, -0.1f, -0.1f), XMFLOAT3(0.0f, 0.0f, 0.0f) },
-            //{ XMFLOAT3(-0.1f, -0.1f,  0.1f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-            //{ XMFLOAT3(-0.1f,  0.1f, -0.1f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-            //{ XMFLOAT3(-0.1f,  0.1f,  0.1f), XMFLOAT3(0.0f, 1.0f, 1.0f) },
-            //{ XMFLOAT3( 0.1f, -0.1f, -0.1f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
-            //{ XMFLOAT3( 0.1f, -0.1f,  0.1f), XMFLOAT3(1.0f, 0.0f, 1.0f) },
-            //{ XMFLOAT3( 0.1f,  0.1f, -0.1f), XMFLOAT3(1.0f, 1.0f, 0.0f) },
-            //{ XMFLOAT3( 0.1f,  0.1f,  0.1f), XMFLOAT3(1.0f, 1.0f, 1.0f) },
+            { XMFLOAT3(-0.1f, -0.1f, -0.1f), XMFLOAT3(0.5f, 0.5f, 0.5f) },
+            { XMFLOAT3(-0.1f, -0.1f,  0.1f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+            { XMFLOAT3(-0.1f,  0.1f, -0.1f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+            { XMFLOAT3(-0.1f,  0.1f,  0.1f), XMFLOAT3(0.0f, 1.0f, 1.0f) },
+            { XMFLOAT3( 0.1f, -0.1f, -0.1f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
+            { XMFLOAT3( 0.1f, -0.1f,  0.1f), XMFLOAT3(1.0f, 0.0f, 1.0f) },
+            { XMFLOAT3( 0.1f,  0.1f, -0.1f), XMFLOAT3(1.0f, 1.0f, 0.0f) },
+            { XMFLOAT3( 0.1f,  0.1f,  0.1f), XMFLOAT3(1.0f, 1.0f, 1.0f) },
         };
 
         D3D11_SUBRESOURCE_DATA vertexBufferData = {0};
-        vertexBufferData.pSysMem = cubeVertices;
+        vertexBufferData.pSysMem = moleculeVertices;
         vertexBufferData.SysMemPitch = 0;
         vertexBufferData.SysMemSlicePitch = 0;
-        const CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(cubeVertices), D3D11_BIND_VERTEX_BUFFER);
+        const CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(moleculeVertices), D3D11_BIND_VERTEX_BUFFER);
         DX::ThrowIfFailed(
             m_deviceResources->GetD3DDevice()->CreateBuffer(
                 &vertexBufferDesc,
@@ -363,7 +361,7 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
         // 2, 1, and 0 from the vertex buffer compose the
         // first triangle of this mesh.
         // Note that the winding order is clockwise by default.
-        //static const unsigned short cubeIndices [] =
+        //static const unsigned short moleculeIndices [] =
         //{
         //    2,1,0, // -x
         //    2,3,1,
@@ -384,18 +382,18 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
         //    1,7,5,
         //};
 
-        static const unsigned short cubeIndices [] =
+        static const unsigned short moleculeIndices [] =
         {
-            0,
+            0,1,2,3,4,5,6,7,
         };
 
-        m_indexCount = ARRAYSIZE(cubeIndices);
+        m_indexCount = ARRAYSIZE(moleculeIndices);
 
         D3D11_SUBRESOURCE_DATA indexBufferData = {0};
-        indexBufferData.pSysMem          = cubeIndices;
+        indexBufferData.pSysMem          = moleculeIndices;
         indexBufferData.SysMemPitch      = 0;
         indexBufferData.SysMemSlicePitch = 0;
-        const CD3D11_BUFFER_DESC indexBufferDesc(sizeof(cubeIndices), D3D11_BIND_INDEX_BUFFER);
+        const CD3D11_BUFFER_DESC indexBufferDesc(sizeof(moleculeIndices), D3D11_BIND_INDEX_BUFFER);
         DX::ThrowIfFailed(
             m_deviceResources->GetD3DDevice()->CreateBuffer(
                 &indexBufferDesc,
@@ -405,8 +403,8 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
             );
     });
 
-    // Once the cube is loaded, the object is ready to be rendered.
-    createCubeTask.then([this] ()
+    // Once the molecule is loaded, the object is ready to be rendered.
+    createMoleculeTask.then([this] ()
     {
         m_loadingComplete = true;
     });

@@ -67,9 +67,9 @@ namespace HoliMoli
         void UnregisterHolographicEventHandlers();
 
 #ifdef DRAW_SAMPLE_CONTENT
-        // Renders a colorful holographic cube that's 20 centimeters wide. This sample content
+        // Renders a colorful holographic molecule that's 20 centimeters wide. This sample content
         // is used to demonstrate world-locked rendering.
-        std::unique_ptr<SpinningMoleculeRenderer>                           m_spinningCubeRenderer;
+        std::unique_ptr<SpinningMoleculeRenderer>                           m_spinningMoleculeRenderer;
 
         // Listens for the Pressed spatial input event.
         std::shared_ptr<SpatialInputHandler>                            m_spatialInputHandler;

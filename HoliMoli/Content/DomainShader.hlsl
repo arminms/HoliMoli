@@ -44,7 +44,7 @@ DS_OUTPUT main(
 
     float pi2 = 6.28318530;
     float pi = pi2 / 2.0f;
-    float R = 0.3;
+    float R = 0.1;
     float fi = pi * UV.x;
     float theta = pi2 * UV.y;
     float sinFi, cosFi, sinTheta, cosTheta;
@@ -60,12 +60,13 @@ DS_OUTPUT main(
     int idx = quad[0].instId;
 
     float4 pos = float4(spherePosition, 1.0f);
+    pos += quad[0].pos;
     pos = mul(pos, model);
     pos = mul(pos, viewProjection[idx]);
 
     output.pos = (min16float4)pos;
-    output.color = (min16float3)(normalize(spherePosition) + 0.4);
-    //output.color  = quad[0].color;
+    //output.color = (min16float3)(normalize(spherePosition) + 0.4);
+    output.color  = quad[0].color;
     output.instId = quad[0].instId;
 
     return output;
