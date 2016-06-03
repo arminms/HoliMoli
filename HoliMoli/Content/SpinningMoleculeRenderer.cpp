@@ -26,8 +26,8 @@ void SpinningMoleculeRenderer::PositionHologram(SpatialPointerPose^ pointerPose)
         const float3 headPosition    = pointerPose->Head->Position;
         const float3 headDirection   = pointerPose->Head->ForwardDirection;
 
-        // The hologram is positioned two meters along the user's gaze direction.
-        static const float distanceFromUser = 2.0f; // meters
+        // The hologram is positioned five meters along the user's gaze direction.
+        static const float distanceFromUser = 5.0f; // meters
         const float3 gazeAtTwoMeters        = headPosition + (distanceFromUser * headDirection);
 
         // This will be used as the translation component of the hologram's
@@ -356,8 +356,10 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
             std::size_t atomsCount = boost::distance(rt->range<atom>());
             std::vector<VertexPositionColor> moleculeVertices(atomsCount);
 
+            // Finding center of the molecule
             mtl::point3f min, max;
-            min.zero(); max.zero();
+            auto atm = rt->begin<atom>();
+            min = max = atm->center();
             for (auto atm : rt->range<atom>())
             {
                 mtl::minimize(min, min, atm->center());
@@ -368,15 +370,16 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
             center.x() *= 0.1f;
             center.y() *= 0.1f;
             center.z() *= 0.1f;
+            std::cerr << center << std::endl;
+            auto trans = mtl::vector3f(center, mtl::point3f(0.f, 0.f, 0.f));
 
-            auto atm = rt->begin<atom>();
             for (std::size_t i = 0; i < atomsCount; ++i, ++atm)
             {
                 auto pos = atm->center();
                 pos.x() *= 0.1f;
                 pos.y() *= 0.1f;
                 pos.z() *= 0.1f;
-                pos += mtl::vector3f(center, mtl::point3f(0.f, 0.f, -2.f));
+                pos += trans;
                 moleculeVertices[i].pos.x = pos.x();
                 moleculeVertices[i].pos.y = pos.y();
                 moleculeVertices[i].pos.z = pos.z();
