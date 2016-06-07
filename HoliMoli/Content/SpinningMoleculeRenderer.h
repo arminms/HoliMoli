@@ -44,8 +44,8 @@ namespace HoliMoli
 
         // Variables used with the rendering loop
         bool                                            m_loadingComplete = false;
-        float                                           m_degreesPerSecond = 5.f;
-        Windows::Foundation::Numerics::float3           m_position = { 0.f, 0.f, -5.f };
+        float                                           m_degreesPerSecond = 1.f;
+        Windows::Foundation::Numerics::float3           m_position = { 0.f, 0.f, -2.f };
 
         // If the current D3D Device supports VPRT, we can avoid using a geometry
         // shader just to set the render target array index

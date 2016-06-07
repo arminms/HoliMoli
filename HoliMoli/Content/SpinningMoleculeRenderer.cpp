@@ -27,7 +27,7 @@ void SpinningMoleculeRenderer::PositionHologram(SpatialPointerPose^ pointerPose)
         const float3 headDirection   = pointerPose->Head->ForwardDirection;
 
         // The hologram is positioned five meters along the user's gaze direction.
-        static const float distanceFromUser = 5.0f; // meters
+        static const float distanceFromUser = 2.0f; // meters
         const float3 gazeAtTwoMeters        = headPosition + (distanceFromUser * headDirection);
 
         // This will be used as the translation component of the hologram's
@@ -151,10 +151,10 @@ void SpinningMoleculeRenderer::Render()
 
     if (!m_usingVprtShaders)
     {
-        // On devices that do not support the D3D11_FEATURE_D3D11_OPTIONS3::
-        // VPAndRTArrayIndexFromAnyShaderFeedingRasterizer optional feature,
-        // a pass-through geometry shader is used to set the render target 
-        // array index.
+         // On devices that do not support the D3D11_FEATURE_D3D11_OPTIONS3::
+         // VPAndRTArrayIndexFromAnyShaderFeedingRasterizer optional feature,
+         // a pass-through geometry shader is used to set the render target 
+         // array index.
         context->GSSetShader(
             m_geometryShader.Get(),
             nullptr,
@@ -220,12 +220,13 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
     // we can avoid using a pass-through geometry shader to set the render
     // target array index, thus avoiding any overhead that would be 
     // incurred by setting the geometry shader stage.
-    std::wstring vertexShaderFileName = m_usingVprtShaders ? L"ms-appx:///VprtVertexShader.cso" : L"ms-appx:///VertexShader.cso";
+    //std::wstring vertexShaderFileName = m_usingVprtShaders ? L"ms-appx:///VprtVertexShader.cso" : L"ms-appx:///VertexShader.cso";
+    std::wstring domainShaderFileName = m_usingVprtShaders ? L"ms-appx:///VprtDomainShader.cso" : L"ms-appx:///DomainShader.cso";
 
     // Load shaders asynchronously.
-    task<std::vector<byte>> loadVSTask = DX::ReadDataAsync(vertexShaderFileName);
+    task<std::vector<byte>> loadVSTask = DX::ReadDataAsync(L"ms-appx:///VertexShader.cso");
     task<std::vector<byte>> loadHSTask = DX::ReadDataAsync(L"ms-appx:///HullShader.cso");
-    task<std::vector<byte>> loadDSTask = DX::ReadDataAsync(L"ms-appx:///DomainShader.cso");
+    task<std::vector<byte>> loadDSTask = DX::ReadDataAsync(domainShaderFileName);
     task<std::vector<byte>> loadPSTask = DX::ReadDataAsync(L"ms-appx:///PixelShader.cso");
 
     task<std::vector<byte>> loadGSTask;

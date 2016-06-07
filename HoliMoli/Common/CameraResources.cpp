@@ -94,6 +94,7 @@ void DX::CameraResources::CreateResourcesForBackBuffer(
     {
         // Create a depth stencil view for use with 3D rendering if needed.
         CD3D11_TEXTURE2D_DESC depthStencilDesc(
+            //DXGI_FORMAT_D32_FLOAT,
             DXGI_FORMAT_D16_UNORM,
             static_cast<UINT>(m_d3dRenderTargetSize.Width),
             static_cast<UINT>(m_d3dRenderTargetSize.Height),
