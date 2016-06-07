@@ -64,6 +64,7 @@ namespace DX
         Microsoft::WRL::ComPtr<ID3D11Device4>                   m_d3dDevice;
         Microsoft::WRL::ComPtr<ID3D11DeviceContext3>            m_d3dContext;
         Microsoft::WRL::ComPtr<IDXGIAdapter3>                   m_dxgiAdapter;
+        Microsoft::WRL::ComPtr<ID3D11RasterizerState>           m_rasterState;
 
         // Direct3D interop objects.
         Windows::Graphics::DirectX::Direct3D11::IDirect3DDevice^ m_d3dInteropDevice;
