@@ -1,3 +1,6 @@
 [submodule "HoliMoli/Dependencies/Maral"]
 	path = HoliMoli/Dependencies/Maral
 	url = https://github.com/arminms/maral.git
+[submodule "HoliMoli/Dependencies/DirectXTK"]
+	path = HoliMoli/Dependencies/DirectXTK
+	url = https://github.com/Microsoft/DirectXTK.git
