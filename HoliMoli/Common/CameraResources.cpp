@@ -256,6 +256,13 @@ bool DX::CameraResources::AttachViewProjectionBuffer(
         m_viewProjectionConstantBuffer.GetAddressOf()
         );
 
+    // Send the constant buffer to the hull shader.
+    context->HSSetConstantBuffers(
+        1,
+        1,
+        m_viewProjectionConstantBuffer.GetAddressOf()
+        );
+
     // Send the constant buffer to the domain shader.
     context->DSSetConstantBuffers(
         1,

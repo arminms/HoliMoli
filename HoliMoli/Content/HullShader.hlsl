@@ -1,3 +1,15 @@
+// A constant buffer that stores the model transform.
+cbuffer ModelConstantBuffer : register(b0)
+{
+    float4x4 model;
+};
+
+// A constant buffer that stores each set of view and projection matrices in column-major format.
+cbuffer ViewProjectionConstantBuffer : register(b1)
+{
+    float4x4 viewProjection[2];
+};
+
 // Input control point
 struct VS_CONTROL_POINT_OUTPUT
 {
@@ -34,13 +46,17 @@ HS_CONSTANT_DATA_OUTPUT CalcHSPatchConstants(
 {
     HS_CONSTANT_DATA_OUTPUT output;
 
+    float4 pos = mul(ip[0].pos, model);
+    pos = mul(pos, viewProjection[ip[0].instId]);
+    float tessFactor = clamp(-5.0f * pos[2] + 25.0f, 5, 25);
+
     // TODO: adding dynamic tessellation factors
     output.EdgeTessFactor[0] =
         output.EdgeTessFactor[1] =
         output.EdgeTessFactor[2] = 
         output.EdgeTessFactor[3] =
         output.InsideTessFactor[0] = 
-        output.InsideTessFactor[1] = TESS_AMOUNT;
+        output.InsideTessFactor[1] = tessFactor;
 
     return output;
 }

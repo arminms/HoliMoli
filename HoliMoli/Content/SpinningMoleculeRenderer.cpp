@@ -134,6 +134,12 @@ void SpinningMoleculeRenderer::Render()
         nullptr,
         0
         );
+    // Apply the model constant buffer to the hull shader.
+    context->HSSetConstantBuffers(
+        0,
+        1,
+        m_modelConstantBuffer.GetAddressOf()
+        );
 
     // Attach the domain shader.
     context->DSSetShader(
