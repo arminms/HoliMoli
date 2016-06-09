@@ -224,10 +224,12 @@
     <AppxBundlePlatforms>x86</AppxBundlePlatforms>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>Dependencies\Maral\src;$(IncludePath)</IncludePath>
+    <IncludePath>Dependencies\Maral\src;Dependencies\DirectXTK\Inc;$(IncludePath)</IncludePath>
+    <LibraryPath>Dependencies\DirectXTK\Bin\Windows10\Win32\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>Dependencies\Maral\src;$(IncludePath)</IncludePath>
+    <IncludePath>Dependencies\Maral\src;Dependencies\DirectXTK\Inc;$(IncludePath)</IncludePath>
+    <LibraryPath>Dependencies\DirectXTK\Bin\Windows10\Win32\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
