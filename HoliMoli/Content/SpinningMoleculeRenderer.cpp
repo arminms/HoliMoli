@@ -122,11 +122,11 @@ void SpinningMoleculeRenderer::Render()
         0
         );
     // Apply the model constant buffer to the vertex shader.
-    context->VSSetConstantBuffers(
-        0,
-        1,
-        m_modelConstantBuffer.GetAddressOf()
-        );
+    //context->VSSetConstantBuffers(
+    //    0,
+    //    1,
+    //    m_modelConstantBuffer.GetAddressOf()
+    //    );
 
     // Attach the hull shader.
     context->HSSetShader(

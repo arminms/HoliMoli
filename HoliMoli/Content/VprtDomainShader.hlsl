@@ -1,20 +1,25 @@
-// A constant buffer that stores the model transform.
+// A constant buffer that stores per-mesh data.
 cbuffer ModelConstantBuffer : register(b0)
 {
-    float4x4 model;
+    float4x4      modelToWorld;
+    min16float4x4 normalToWorld;
 };
 
 // A constant buffer that stores each set of view and projection matrices in column-major format.
 cbuffer ViewProjectionConstantBuffer : register(b1)
 {
+    float4   cameraPosition;
+    float4   lightPosition;
     float4x4 viewProjection[2];
 };
 
 struct DS_OUTPUT
 {
-    min16float4 pos    : SV_POSITION;
-    min16float3 color  : COLOR0;
-    uint rtvId         : SV_RenderTargetArrayIndex;
+    min16float4 screenPos : SV_POSITION;
+    min16float3 worldPos  : POSITION0;
+    min16float3 normal    : NORMAL0;
+    min16float3 color     : COLOR0;
+    uint        rtvId     : SV_RenderTargetArrayIndex;
 };
 
 // Output control point
@@ -22,13 +27,13 @@ struct HS_CONTROL_POINT_OUTPUT
 {
     min16float4 pos    : POSITION;
     min16float3 color  : COLOR0;
-    uint instId        : TEXCOORD0;
+    uint        instId : TEXCOORD0;
 };
 
 // Output patch constant data.
 struct HS_CONSTANT_DATA_OUTPUT
 {
-    float EdgeTessFactor[4] : SV_TessFactor; // 4 for quad
+    float EdgeTessFactor[4]   : SV_TessFactor; // 4 for quad
     float InsideTessFactor[2] : SV_InsideTessFactor; // 2 for quad
 };
 
@@ -61,10 +66,20 @@ DS_OUTPUT main(
 
     float4 pos = float4(spherePosition, 1.0f);
     pos += quad[0].pos;
-    pos = mul(pos, model);
-    pos = mul(pos, viewProjection[idx]);
+    pos = mul(pos, modelToWorld);
 
-    output.pos = (min16float4) pos;
+    // Store the world position.
+    output.worldPos = (min16float3)pos;
+
+    // Compute the normal.
+    float4 center = mul(quad[0].pos, modelToWorld);
+    min16float4 normal = min16float4(pos - center);
+    output.normal = (min16float3)normalize(normal);
+
+    // Correct for perspective and project the vertex position onto the screen.
+    pos = mul(pos, viewProjection[idx]);
+    output.screenPos = (min16float4)pos;
+
     //output.color = (min16float3)(normalize(spherePosition) + 0.4);
     output.color = quad[0].color;
     output.rtvId = quad[0].instId;

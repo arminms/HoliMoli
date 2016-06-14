@@ -250,11 +250,11 @@ bool DX::CameraResources::AttachViewProjectionBuffer(
     context->RSSetViewports(1, &m_d3dViewport);
 
     // Send the constant buffer to the vertex shader.
-    context->VSSetConstantBuffers(
-        1,
-        1,
-        m_viewProjectionConstantBuffer.GetAddressOf()
-        );
+    //context->VSSetConstantBuffers(
+    //    1,
+    //    1,
+    //    m_viewProjectionConstantBuffer.GetAddressOf()
+    //    );
 
     // Send the constant buffer to the hull shader.
     context->HSSetConstantBuffers(

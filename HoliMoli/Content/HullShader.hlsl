@@ -1,12 +1,15 @@
-// A constant buffer that stores the model transform.
+// A constant buffer that stores per-mesh data.
 cbuffer ModelConstantBuffer : register(b0)
 {
-    float4x4 model;
+    float4x4      modelToWorld;
+    min16float4x4 normalToWorld;
 };
 
 // A constant buffer that stores each set of view and projection matrices in column-major format.
 cbuffer ViewProjectionConstantBuffer : register(b1)
 {
+    float4   cameraPosition;
+    float4   lightPosition;
     float4x4 viewProjection[2];
 };
 
@@ -15,7 +18,7 @@ struct VS_CONTROL_POINT_OUTPUT
 {
     min16float4 pos     : POSITION;
     min16float3 color   : COLOR0;
-    uint instId         : TEXCOORD0;
+    uint        instId  : TEXCOORD0;
 };
 
 // Output control point
@@ -23,7 +26,7 @@ struct HS_CONTROL_POINT_OUTPUT
 {
     min16float4 pos     : POSITION;
     min16float3 color   : COLOR0;
-    uint instId         : TEXCOORD0;
+    uint        instId  : TEXCOORD0;
 };
 
 // Output patch constant data.
@@ -46,7 +49,7 @@ HS_CONSTANT_DATA_OUTPUT CalcHSPatchConstants(
 {
     HS_CONSTANT_DATA_OUTPUT output;
 
-    float4 pos = mul(ip[0].pos, model);
+    float4 pos = mul(ip[0].pos, modelToWorld);
     pos = mul(pos, viewProjection[ip[0].instId]);
     float tessFactor = clamp(-5.0f * pos[2] + 25.0f, 5, 25);
 
