@@ -7,6 +7,7 @@
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
+using namespace Windows::Foundation::Numerics;
 using namespace Windows::Graphics::DirectX::Direct3D11;
 using namespace Windows::Graphics::Holographic;
 using namespace Windows::Perception::Spatial;
@@ -203,7 +204,19 @@ void DX::CameraResources::UpdateViewProjectionBuffer(
             &viewProjectionConstantBufferData.viewProjection[1],
             XMMatrixTranspose(XMLoadFloat4x4(&viewCoordinateSystemTransform.Right) * XMLoadFloat4x4(&cameraProjectionTransform.Right))
             );
-    }
+
+        float4x4 viewInverse;
+        bool invertible = Windows::Foundation::Numerics::invert(viewCoordinateSystemTransform.Left, &viewInverse);
+        if (invertible)
+        {
+            // Use the camera position as a light source.
+            float4 cameraPosition = float4(viewInverse.m41, viewInverse.m42, viewInverse.m43, 0.f);
+            float4 lightPosition = cameraPosition + float4(-1.5f, 2.f, 0.f, 0.f);
+
+            XMStoreFloat4(&viewProjectionConstantBufferData.cameraPosition, DirectX::XMLoadFloat4(&cameraPosition));
+            XMStoreFloat4(&viewProjectionConstantBufferData.lightPosition, DirectX::XMLoadFloat4(&lightPosition));
+        }
+   }
 
     // Use the D3D device context to update Direct3D device-based resources.
     const auto context = deviceResources->GetD3DDeviceContext();
@@ -265,6 +278,13 @@ bool DX::CameraResources::AttachViewProjectionBuffer(
 
     // Send the constant buffer to the domain shader.
     context->DSSetConstantBuffers(
+        1,
+        1,
+        m_viewProjectionConstantBuffer.GetAddressOf()
+        );
+
+    // Send the constant buffer to the pixel shader.
+    context->PSSetConstantBuffers(
         1,
         1,
         m_viewProjectionConstantBuffer.GetAddressOf()

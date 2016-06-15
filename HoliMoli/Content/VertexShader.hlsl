@@ -2,7 +2,6 @@
 //cbuffer ModelConstantBuffer : register(b0)
 //{
 //    float4x4      modelToWorld;
-//    min16float4x4 normalToWorld;
 //};
 
 // A constant buffer that stores each set of view and projection matrices in column-major format.
@@ -44,7 +43,7 @@ VertexShaderOutput main(VertexShaderInput input)
     int idx = input.instId % 2;
 
     // Transform the vertex position into world space.
-    //pos = mul(pos, model);
+    //pos = mul(pos, modelToWorld);
 
     // Correct for perspective and project the vertex position onto the screen.
     //pos = mul(pos, viewProjection[idx]);

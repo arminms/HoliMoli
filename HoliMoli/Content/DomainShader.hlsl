@@ -1,8 +1,9 @@
+// This is the shader active on HoloLens Emulator
+
 // A constant buffer that stores per-mesh data.
 cbuffer ModelConstantBuffer : register(b0)
 {
     float4x4      modelToWorld;
-    min16float4x4 normalToWorld;
 };
 
 // A constant buffer that stores each set of view and projection matrices in column-major format.
@@ -17,7 +18,7 @@ struct DS_OUTPUT
 {
     min16float4 screenPos : SV_POSITION;
     min16float3 worldPos  : POSITION0;
-    min16float3 normal    : NORMAL0;
+    min16float3 worldNorm : NORMAL0;
     min16float3 color     : COLOR0;
     uint        instId    : TEXCOORD0;
 };
@@ -65,20 +66,20 @@ DS_OUTPUT main(
     int idx = quad[0].instId;
 
     float4 pos = float4(spherePosition, 1.0f);
+
     pos += quad[0].pos;
     pos = mul(pos, modelToWorld);
 
     // Store the world position.
     output.worldPos = (min16float3)pos;
 
-    // Compute the normal.
-    float4 center = mul(quad[0].pos, modelToWorld);
-    min16float4 normal = min16float4(pos - center);
-    output.normal = (min16float3)normalize(normal);
-
     // Correct for perspective and project the vertex position onto the screen.
     pos = mul(pos, viewProjection[idx]);
     output.screenPos = (min16float4)pos;
+
+    // Calculate the normal by applying only the rotation parts of the transform.
+    float3 normal = mul(spherePosition, (float3x3)modelToWorld);
+    output.worldNorm = (min16float3)normal;
 
     //output.color = (min16float3)(normalize(spherePosition) + 0.4);
     output.color  = quad[0].color;

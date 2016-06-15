@@ -2,7 +2,6 @@
 cbuffer ModelConstantBuffer : register(b0)
 {
     float4x4      modelToWorld;
-    min16float4x4 normalToWorld;
 };
 
 // A constant buffer that stores each set of view and projection matrices in column-major format.
@@ -51,7 +50,7 @@ HS_CONSTANT_DATA_OUTPUT CalcHSPatchConstants(
 
     float4 pos = mul(ip[0].pos, modelToWorld);
     pos = mul(pos, viewProjection[ip[0].instId]);
-    float tessFactor = clamp(-5.0f * pos[2] + 25.0f, 5, 25);
+    float tessFactor = clamp(-2.0f * pos.z + 25.0f, 5, 25);
 
     // TODO: adding dynamic tessellation factors
     output.EdgeTessFactor[0] =

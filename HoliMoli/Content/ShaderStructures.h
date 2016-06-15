@@ -5,7 +5,7 @@ namespace HoliMoli
     // Constant buffer used to send hologram position transform to the shader pipeline.
     struct ModelConstantBuffer
     {
-        DirectX::XMFLOAT4X4 model;
+        DirectX::XMFLOAT4X4 modelToWorld;
     };
 
     // Assert that the constant buffer remains 16-byte aligned (best practice).

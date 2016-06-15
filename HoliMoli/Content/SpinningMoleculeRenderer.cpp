@@ -59,7 +59,7 @@ void SpinningMoleculeRenderer::Update(const DX::StepTimer& timer)
     // with holographic cameras, and updated on a per-camera basis.
     // Here, we provide the model transform for the sample hologram. The model transform
     // matrix is transposed to prepare it for the shader.
-    XMStoreFloat4x4(&m_modelConstantBufferData.model, XMMatrixTranspose(modelTransform));
+    XMStoreFloat4x4(&m_modelConstantBufferData.modelToWorld, XMMatrixTranspose(modelTransform));
 
     // Loading is asynchronous. Resources must be created before they can be updated.
     if (!m_loadingComplete)
@@ -175,6 +175,13 @@ void SpinningMoleculeRenderer::Render()
         0
         );
 
+    // Apply the model constant buffer to the pixel shader.
+    context->PSSetConstantBuffers(
+        0,
+        1,
+        m_modelConstantBuffer.GetAddressOf()
+        );
+
     // Draw the objects.
     context->DrawInstanced(
         m_indexCount    // Index count per instance
@@ -233,7 +240,8 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
     task<std::vector<byte>> loadVSTask = DX::ReadDataAsync(L"ms-appx:///VertexShader.cso");
     task<std::vector<byte>> loadHSTask = DX::ReadDataAsync(L"ms-appx:///HullShader.cso");
     task<std::vector<byte>> loadDSTask = DX::ReadDataAsync(domainShaderFileName);
-    task<std::vector<byte>> loadPSTask = DX::ReadDataAsync(L"ms-appx:///PixelShader.cso");
+    //task<std::vector<byte>> loadPSTask = DX::ReadDataAsync(L"ms-appx:///PixelShader.cso");
+    task<std::vector<byte>> loadPSTask = DX::ReadDataAsync(L"ms-appx:///SimpleLightingPixelShader.cso");
 
     task<std::vector<byte>> loadGSTask;
     if (!m_usingVprtShaders)
@@ -391,13 +399,13 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
                 moleculeVertices[i].pos.y = pos.y();
                 moleculeVertices[i].pos.z = pos.z();
                 if (atm->atomic_number() == 6)
-                    moleculeVertices[i].color = XMFLOAT3(0.5f, 0.5f, 0.5f);
+                    moleculeVertices[i].color = XMFLOAT3(0.58f, 0.58f, 0.58f);
                 else if (atm->atomic_number() == 7)
-                    moleculeVertices[i].color = XMFLOAT3(0.0f, 0.0f, 1.0f);
+                    moleculeVertices[i].color = XMFLOAT3(0.0f, 0.58f, 0.8f);
                 else if (atm->atomic_number() == 8)
-                    moleculeVertices[i].color = XMFLOAT3(1.0f, 0.0f, 0.0f);
+                    moleculeVertices[i].color = XMFLOAT3(0.89f, 0.31f, 0.31f);
                 else
-                    moleculeVertices[i].color = XMFLOAT3(1.0f, 1.0f, 0.0f);
+                    moleculeVertices[i].color = XMFLOAT3(1.0f, 0.79f, 0.0f);
             }
 
             //// Load mesh vertices. Each vertex has a position and a color.

@@ -2,7 +2,6 @@
 cbuffer ModelConstantBuffer : register(b0)
 {
     float4x4      modelToWorld;
-    min16float4x4 normalToWorld;
 };
 
 // A constant buffer that stores each set of view and projection matrices in column-major format.
@@ -26,7 +25,7 @@ struct PixelShaderInput
 min16float4 main(PixelShaderInput input) : SV_TARGET
 {
     min16float3 lightDiffuseColorValue = min16float3(1.f, 1.f, 1.f);
-    min16float3 objectBaseColorValue    = min16float3(input.color);
+    min16float3 objectBaseColorValue   = min16float3(input.color);
 
     // N is the surface normal, which points directly away from the surface.
     min16float3 N = normalize(input.worldNorm);
@@ -55,12 +54,12 @@ min16float4 main(PixelShaderInput input) : SV_TARGET
     min16float3 diffuseColor = lightDiffuseColorValue * objectBaseColorValue * clampedNDotL;
 
     // The specular contribution is based on dot(N, H).
-    const min16float  specularExponent   = min16float(4.f);
+    const min16float  specularExponent   = min16float(120.f);
     const min16float3 specularColorValue = min16float3(1.f, 1.f, 0.9f);
     const min16float3 specularColor      = specularColorValue * pow(clampedNDotH, specularExponent) * oneOverDistanceFromSurfaceToLight;
 
     // Now, we can sum the ambient, diffuse, and specular contributions to determine the lighting value for the pixel.
-    const min16float3 surfaceLitColor = objectBaseColorValue * min16float(0.2f) + diffuseColor * min16float(0.6f) + specularColor * min16float(0.2f);
+    const min16float3 surfaceLitColor = objectBaseColorValue * min16float(0.3f) + diffuseColor * min16float(0.6f) + specularColor * min16float(0.2f);
 
     return min16float4(surfaceLitColor, 1.f);
 }
