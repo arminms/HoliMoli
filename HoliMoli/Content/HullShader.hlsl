@@ -65,7 +65,7 @@ HS_CONSTANT_DATA_OUTPUT CalcHSPatchConstants(
 
 [domain("quad")]
 [partitioning("fractional_odd")]
-[outputtopology("triangle_cw")]
+[outputtopology("triangle_ccw")]
 [outputcontrolpoints(NUM_CONTROL_POINTS)]
 [patchconstantfunc("CalcHSPatchConstants")]
 HS_CONTROL_POINT_OUTPUT main( 
