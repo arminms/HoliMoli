@@ -21,4 +21,8 @@
 #include <map>
 #include <mutex>
 
+// DirectXTK headers
+#include <CommonStates.h>
+
+// Maral headers
 #include "Dependencies\Maral\src\maral\bootstraps\bs_pdb_multimodel.hpp"

@@ -288,6 +288,8 @@ bool HoliMoliMain::Render(Windows::Graphics::Holographic::HolographicFrame^ holo
             if (cameraActive)
             {
                 // Draw the sample hologram.
+                //auto states = std::make_unique<DirectX::CommonStates>(m_deviceResources->GetD3DDevice());
+                //m_deviceResources->GetD3DDeviceContext()->RSSetState(states->Wireframe());
                 m_spinningMoleculeRenderer->Render();
             }
 #endif

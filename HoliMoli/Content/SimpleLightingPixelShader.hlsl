@@ -54,7 +54,7 @@ min16float4 main(PixelShaderInput input) : SV_TARGET
     min16float3 diffuseColor = lightDiffuseColorValue * objectBaseColorValue * clampedNDotL;
 
     // The specular contribution is based on dot(N, H).
-    const min16float  specularExponent   = min16float(120.f);
+    const min16float  specularExponent   = min16float(100.f);
     const min16float3 specularColorValue = min16float3(1.f, 1.f, 0.9f);
     const min16float3 specularColor      = specularColorValue * pow(clampedNDotH, specularExponent) * oneOverDistanceFromSurfaceToLight;
 
