@@ -50,7 +50,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <PackageCertificateKeyFile>HoliMoli_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateKeyFile>HoliMoli_StoreKey.pfx</PackageCertificateKeyFile>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -109,6 +109,7 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="..\README.md" />
+    <None Include="HoliMoli_StoreKey.pfx" />
     <None Include="HoliMoli_TemporaryKey.pfx" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -216,6 +217,9 @@
     <Image Include="Assets\Wide310x150Logo.scale-200.png" />
     <Image Include="Assets\Wide310x150Logo.scale-400.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Package.StoreAssociation.xml" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(VSINSTALLDIR)\Common7\IDE\Extensions\Microsoft\VsGraphics\ImageContentTask.targets" />
@@ -228,6 +232,7 @@
     <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x86</AppxBundlePlatforms>
+    <PackageCertificateThumbprint>86610DFF4B70B1E4DFA74493D5740CBA5659B3E7</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>Dependencies\Maral\src;$(IncludePath)</IncludePath>
