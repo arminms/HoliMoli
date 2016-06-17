@@ -358,7 +358,7 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
 
         HttpClient^ httpClient = ref new HttpClient();
         auto getPdbTask = create_task(httpClient->GetStringAsync(
-            ref new Windows::Foundation::Uri(L"http://files.rcsb.org/download/1crn.pdb")))
+            ref new Windows::Foundation::Uri(L"http://files.rcsb.org/download/1bna.pdb")))
         .then([this] (task<Platform::String^> task)
         {
 
@@ -398,14 +398,15 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
                 moleculeVertices[i].pos.x = pos.x();
                 moleculeVertices[i].pos.y = pos.y();
                 moleculeVertices[i].pos.z = pos.z();
-                if (atm->atomic_number() == 6)
-                    moleculeVertices[i].color = XMFLOAT3(0.58f, 0.58f, 0.58f);
-                else if (atm->atomic_number() == 7)
-                    moleculeVertices[i].color = XMFLOAT3(0.0f, 0.58f, 0.8f);
-                else if (atm->atomic_number() == 8)
-                    moleculeVertices[i].color = XMFLOAT3(0.89f, 0.31f, 0.31f);
-                else
-                    moleculeVertices[i].color = XMFLOAT3(1.0f, 0.79f, 0.0f);
+                moleculeVertices[i].color = m_elementsColors.m_color[atm->atomic_number()];
+                //if (atm->atomic_number() == 6)
+                //    moleculeVertices[i].color = XMFLOAT3(0.58f, 0.58f, 0.58f);
+                //else if (atm->atomic_number() == 7)
+                //    moleculeVertices[i].color = XMFLOAT3(0.0f, 0.58f, 0.8f);
+                //else if (atm->atomic_number() == 8)
+                //    moleculeVertices[i].color = XMFLOAT3(0.89f, 0.31f, 0.31f);
+                //else
+                //    moleculeVertices[i].color = XMFLOAT3(1.0f, 0.79f, 0.0f);
             }
 
             //// Load mesh vertices. Each vertex has a position and a color.

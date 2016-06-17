@@ -3,6 +3,7 @@
 #include "..\Common\DeviceResources.h"
 #include "..\Common\StepTimer.h"
 #include "ShaderStructures.h"
+#include "ElementsColor.h"
 
 namespace HoliMoli
 {
@@ -50,5 +51,8 @@ namespace HoliMoli
         // If the current D3D Device supports VPRT, we can avoid using a geometry
         // shader just to set the render target array index
         bool                                            m_usingVprtShaders = false;
+
+        // Elements color
+        elements_color_db<>                             m_elementsColors;
     };
 }

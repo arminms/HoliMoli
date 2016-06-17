@@ -83,6 +83,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AppView.h" />
+    <ClInclude Include="Content\ElementsColor.h" />
     <ClInclude Include="Content\SpinningMoleculeRenderer.h" />
     <ClInclude Include="HoliMoliMain.h" />
     <ClInclude Include="Common\DeviceResources.h" />
@@ -109,6 +110,7 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="..\README.md" />
+    <None Include="Content\ElementsColor.ipp" />
     <None Include="HoliMoli_StoreKey.pfx" />
     <None Include="HoliMoli_TemporaryKey.pfx" />
     <None Include="packages.config" />
