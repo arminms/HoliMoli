@@ -358,7 +358,7 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
 
         HttpClient^ httpClient = ref new HttpClient();
         auto getPdbTask = create_task(httpClient->GetStringAsync(
-            ref new Windows::Foundation::Uri(L"http://files.rcsb.org/download/1bna.pdb")))
+            ref new Windows::Foundation::Uri(L"http://files.rcsb.org/download/1crn.pdb")))
         .then([this] (task<Platform::String^> task)
         {
 
@@ -380,11 +380,15 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
                 mtl::minimize(min, min, atm->center());
                 mtl::maximize(max, max, atm->center());
             }
+
+            auto extent = mtl::vector3f(min, max);
+            m_scaling = 1.0f / mtl::length(extent);
+
             mtl::point3f center;
             mtl::middle(center, min, max);
-            center.x() *= 0.1f;
-            center.y() *= 0.1f;
-            center.z() *= 0.1f;
+            center.x() *= m_scaling;
+            center.y() *= m_scaling;
+            center.z() *= m_scaling;
             std::cerr << center << std::endl;
             auto trans = mtl::vector3f(center, mtl::point3f(0.f, 0.f, 0.f));
 
