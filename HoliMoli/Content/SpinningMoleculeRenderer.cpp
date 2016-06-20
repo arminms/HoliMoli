@@ -60,6 +60,7 @@ void SpinningMoleculeRenderer::Update(const DX::StepTimer& timer)
     // Here, we provide the model transform for the sample hologram. The model transform
     // matrix is transposed to prepare it for the shader.
     XMStoreFloat4x4(&m_modelConstantBufferData.modelToWorld, XMMatrixTranspose(modelTransform));
+    m_modelConstantBufferData.modelScaling = m_scaling;
 
     // Loading is asynchronous. Resources must be created before they can be updated.
     if (!m_loadingComplete)
@@ -395,9 +396,9 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
             for (std::size_t i = 0; i < atomsCount; ++i, ++atm)
             {
                 auto pos = atm->center();
-                pos.x() *= 0.1f;
-                pos.y() *= 0.1f;
-                pos.z() *= 0.1f;
+                pos.x() *= m_scaling;
+                pos.y() *= m_scaling;
+                pos.z() *= m_scaling;
                 pos += trans;
                 moleculeVertices[i].pos.x = pos.x();
                 moleculeVertices[i].pos.y = pos.y();

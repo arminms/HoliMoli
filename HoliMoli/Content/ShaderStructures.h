@@ -6,6 +6,8 @@ namespace HoliMoli
     struct ModelConstantBuffer
     {
         DirectX::XMFLOAT4X4 modelToWorld;
+        float               modelScaling;
+        float               dummy[3];
     };
 
     // Assert that the constant buffer remains 16-byte aligned (best practice).
