@@ -4,6 +4,7 @@
 cbuffer ModelConstantBuffer : register(b0)
 {
     float4x4      modelToWorld;
+    float4x4      normalsToWorld;
 };
 
 // A constant buffer that stores each set of view and projection matrices in column-major format.
@@ -78,7 +79,7 @@ DS_OUTPUT main(
     output.screenPos = (min16float4)pos;
 
     // Calculate the normal by applying only the rotation parts of the transform.
-    float3 normal = mul(spherePosition, (float3x3)modelToWorld);
+    float3 normal = mul(spherePosition, (float3x3)normalsToWorld);
     output.worldNorm = (min16float3)normal;
 
     //output.color = (min16float3)(normalize(spherePosition) + 0.4);

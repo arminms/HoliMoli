@@ -27,7 +27,7 @@ void SpinningMoleculeRenderer::PositionHologram(SpatialPointerPose^ pointerPose)
         const float3 headDirection   = pointerPose->Head->ForwardDirection;
 
         // The hologram is positioned five meters along the user's gaze direction.
-        static const float distanceFromUser = 2.0f; // meters
+        static const float distanceFromUser = 1.5f; // meters
         const float3 gazeAtTwoMeters        = headPosition + (distanceFromUser * headDirection);
 
         // This will be used as the translation component of the hologram's
@@ -59,14 +59,16 @@ void SpinningMoleculeRenderer::Update(const DX::StepTimer& timer)
     // Multiply to get the transform matrix.
     // Note that this transform does not enforce a particular coordinate system. The calling
     // class is responsible for rendering this content in a consistent manner.
-    const XMMATRIX modelTransform = XMMatrixMultiply(XMLoadFloat4x4(&m_moleculeTranform), modelRtnSclTrn);
+    const XMMATRIX moleculeTransform = XMLoadFloat4x4(&m_moleculeTranform);
+    const XMMATRIX modelTransform = XMMatrixMultiply(moleculeTransform, modelRtnSclTrn);
+    const XMMATRIX normalsTransform = XMMatrixMultiply(moleculeTransform, modelRotation);
 
     // The view and projection matrices are provided by the system; they are associated
     // with holographic cameras, and updated on a per-camera basis.
     // Here, we provide the model transform for the sample hologram. The model transform
     // matrix is transposed to prepare it for the shader.
     XMStoreFloat4x4(&m_modelConstantBufferData.modelToWorld, XMMatrixTranspose(modelTransform));
-
+    XMStoreFloat4x4(&m_modelConstantBufferData.normalsToWorld, XMMatrixTranspose(normalsTransform));
 
     // Loading is asynchronous. Resources must be created before they can be updated.
     if (!m_loadingComplete)
@@ -366,7 +368,7 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
             // Windows Holographic is scaled in meters, so to draw the molecule
             // at a comfortable size we made the molecule width 0.2 m (20 cm).
             auto extent = mtl::vector3f(min, max);
-            m_scaling = 2.f / mtl::length(extent);
+            m_scaling = 1.0f / mtl::length(extent);
 
             mtl::point3f center;
             mtl::middle(center, min, max);
