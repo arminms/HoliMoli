@@ -47,24 +47,19 @@ void SpinningMoleculeRenderer::Update(const DX::StepTimer& timer)
     const float    radians          = static_cast<float>(fmod(totalRotation, XM_2PI));
     const XMMATRIX modelRotation    = XMMatrixRotationY(-radians);
 
+    // Scaling the molecule.
+    XMFLOAT3 scaling = { m_scaling, m_scaling, m_scaling };
+    const XMMATRIX modelScaling = XMMatrixScalingFromVector(XMLoadFloat3(&scaling));
+    const XMMATRIX modelRtnScl = XMMatrixMultiply(modelRotation, modelScaling);
+
     // Position the molecule.
     const XMMATRIX modelTranslation = XMMatrixTranslationFromVector(XMLoadFloat3(&m_position));
+    const XMMATRIX modelRtnSclTrn = XMMatrixMultiply(modelRtnScl, modelTranslation);
 
     // Multiply to get the transform matrix.
-    //const XMMATRIX animTransform   = XMMatrixMultiply(modelRotation, modelTranslation);
-    const XMMATRIX modelTransform   = XMMatrixMultiply(modelRotation, modelTranslation);
-
     // Note that this transform does not enforce a particular coordinate system. The calling
     // class is responsible for rendering this content in a consistent manner.
-    //const XMMATRIX modelTransformB4Scaling = XMMatrixMultiply(animTransform, m_moleculeTranformation);
-    //const XMMATRIX modelTransformB4Scaling = XMMatrixMultiply(XMLoadFloat4x4(&m_moleculeTranformation), animTransform);
-
-    // Preparing model scaling
-    m_modelConstantBufferData.modelScaling = m_scaling;
-    //XMFLOAT3 scaling = { m_scaling, m_scaling, m_scaling };
-    //const XMMATRIX modelScaling = XMMatrixScalingFromVector(XMLoadFloat3(&scaling));
-    //const XMMATRIX modelTransform   = XMMatrixMultiply(modelScaling, modelTransformB4Scaling);
-    //const XMMATRIX modelTransform   = XMMatrixMultiply(modelTransformB4Scaling, modelScaling);
+    const XMMATRIX modelTransform = XMMatrixMultiply(XMLoadFloat4x4(&m_moleculeTranform), modelRtnSclTrn);
 
     // The view and projection matrices are provided by the system; they are associated
     // with holographic cameras, and updated on a per-camera basis.
@@ -213,31 +208,6 @@ void SpinningMoleculeRenderer::Render()
 
 void SpinningMoleculeRenderer::CreateDeviceDependentResources()
 {
-    // Trying to read a PDB file
-    //using namespace Windows::Web::Http;
-    //HttpClient^ httpClient = ref new HttpClient();
-    //auto getPdbTask = create_task(httpClient->GetStringAsync(
-    //    ref new Windows::Foundation::Uri(L"http://files.rcsb.org/download/1crn.pdb")))
-    //.then([] (task<Platform::String^> task)
-    //{
-    //    using namespace maral;
-    //    using namespace maral::bootstrap::pdb_multimodel;
-
-    //    Platform::String^ text = task.get();
-    //    std::wstring textW(text->Data());
-    //    //OutputDebugString(textW.c_str());
-    //    std::string textA(textW.begin(), textW.end());
-    //    std::istringstream is(textA);
-    //    auto rt = make<root>();
-    //    is >> rt;
-    //    //std::ostringstream os;
-    //    //os << delimiters('[', ']') << separator(' ')
-    //    //   << shallow << rt << std::endl;
-    //    //auto temp = os.str();
-    //    //std::wstring out(temp.begin(), temp.end());
-    //    //OutputDebugString(out.c_str());
-    //});
-
     m_usingVprtShaders = m_deviceResources->GetDeviceSupportsVprt();
 
     // On devices that do support the D3D11_FEATURE_D3D11_OPTIONS3::
@@ -370,7 +340,7 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
 
         HttpClient^ httpClient = ref new HttpClient();
         auto getPdbTask = create_task(httpClient->GetStringAsync(
-            ref new Windows::Foundation::Uri(L"http://files.rcsb.org/download/1bna.pdb")))
+            ref new Windows::Foundation::Uri(L"http://files.rcsb.org/download/1crn.pdb")))
         .then([this] (task<Platform::String^> task)
         {
 
@@ -393,127 +363,41 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
                 mtl::maximize(max, max, atm->center());
             }
 
+            // Windows Holographic is scaled in meters, so to draw the molecule
+            // at a comfortable size we made the molecule width 0.2 m (20 cm).
             auto extent = mtl::vector3f(min, max);
-            m_scaling = 1.0f / mtl::length(extent);
+            m_scaling = 2.f / mtl::length(extent);
 
             mtl::point3f center;
             mtl::middle(center, min, max);
-            //center.x() *= m_scaling;
-            //center.y() *= m_scaling;
-            //center.z() *= m_scaling;
             auto trans = mtl::vector3f(center, mtl::point3f(0.f, 0.f, 0.f));
 
             // building translation matrix
             XMFLOAT3 transVec = { trans.x(), trans.y(), trans.z() };
             const XMMATRIX tr = XMMatrixTranslationFromVector(XMLoadFloat3(&transVec));
 
-            //mtl::matrix44f tr;
-            //tr.identity();
-            //tr(12) = trans[0];
-            //tr(13) = trans[1];
-            //tr(14) = trans[2];
-
+            // building rotation matrix
             mtl::normalize(extent);
             mtl::vector3f rotAxis;
             mtl::cross(rotAxis, extent, mtl::vector3f(0.f, 1.f, 0.f));
             mtl::normalize(rotAxis);
 
-            //// building rotation matrix
             XMFLOAT3 axisVec = { rotAxis.x(), rotAxis.y(), rotAxis.z() };
             float rad = mtl::angle(extent, mtl::vector3f(0.f, 1.f, 0.f));
             const XMMATRIX ro = XMMatrixRotationAxis(XMLoadFloat3(&axisVec), rad);
 
-            //mtl::matrix44f r;
-            //float c, one_c, s;
-            //float x, y, z;
-            //float xx, yy, zz, xy, yz, xs, ys, zx, zs;
+            // final multiplications and storing
+            const XMMATRIX trNRot = XMMatrixMultiply(tr, ro);
+            XMStoreFloat4x4(&m_moleculeTranform, trNRot);
+            //XMStoreFloat4x4(&m_moleculeTranform, tr);
 
-            //x = rotAxis.x(); y = rotAxis.y(); z = rotAxis.z();
-            //float rad = mtl::angle(extent, mtl::vector3f(0.f, 1.f, 0.f));
-            //c = cosf(rad);
-            //s = sinf(rad);
-            //one_c = 1.0f - c;
-
-            //xx = x*x; yy = y*y; zz = z*z;
-            //xy = x*y; yz = y*z; zx = z*x;
-            //xs = x*s; ys = y*s; zs = z*s;
-
-            //r(0,0) = (one_c * xx) + c;
-            //r(0,1) = (one_c * xy) - zs;
-            //r(0,2) = (one_c * zx) + ys;
-            //r(0,3) = 0.0f;
-
-            //r(1,0) = (one_c * xy) + zs;
-            //r(1,1) = (one_c * yy) + c;
-            //r(1,2) = (one_c * yz) - xs;
-            //r(1,3) = 0.0f;
-
-            //r(2,0) = (one_c * zx) - ys;
-            //r(2,1) = (one_c * yz) + xs;
-            //r(2,2) = (one_c * zz) + c;
-            //r(2,3) = 0.0f;
-
-            //r(3,0) = 0.0f;
-            //r(3,1) = 0.0f;
-            //r(3,2) = 0.0f;
-            //r(3,3) = 1.0f;
-
-            // building scaling matrix
-            XMFLOAT3 scalingVec = { m_scaling, m_scaling, m_scaling };
-            const XMMATRIX sc = XMMatrixScalingFromVector(XMLoadFloat3(&scalingVec));
-
-            //mtl::matrix44f sc;
-            //sc.identity();
-            //sc(0)  = m_scaling;
-            //sc(5)  = m_scaling;
-            //sc(10) = m_scaling;
-
-            // multiplying
-            //tr *= r;
-            //tr *= sc;
-
-            const XMMATRIX frst = XMMatrixMultiply(tr, ro);
-            const XMMATRIX test = XMMatrixMultiply(frst, sc);
-            //XMMATRIX test;
-            //for (auto i = 0; i < 4; ++i)
-            //    for (auto j = 0; j < 4; ++j)
-            //        test.r[i].m128_f32[j] = tr(i, j);
-            //        //m_moleculeTranformation.m[i][j] = tr(i, j);
-
+            // Load atoms as vertices. Each vertex has a position and a color.
             for (std::size_t i = 0; i < atomsCount; ++i, ++atm)
             {
-                auto init_pos = atm->center();
-                XMVECTOR posB4Trans = XMVectorSet(init_pos.x(), init_pos.y(), init_pos.z(), 1.f);
-                XMVECTOR pos = XMVector3Transform(posB4Trans, test);
-                XMStoreFloat3(&(moleculeVertices[i].pos), pos);
-
-                //auto pos = atm->center();
-                //pos.x() *= m_scaling;
-                //pos.y() *= m_scaling;
-                //pos.z() *= m_scaling;
-                //pos += trans;
-                //moleculeVertices[i].pos.x = pos.x();
-                //moleculeVertices[i].pos.y = pos.y();
-                //moleculeVertices[i].pos.z = pos.z();
-
+                XMStoreFloat3(&moleculeVertices[i].pos, 
+                              XMVectorSet(atm->center().x(), atm->center().y(), atm->center().z(), 1.f));
                 moleculeVertices[i].color = m_elementsColors.m_color[atm->atomic_number()];
             }
-
-            //// Load mesh vertices. Each vertex has a position and a color.
-            //// Note that the molecule size has changed from the default DirectX app
-            //// template. Windows Holographic is scaled in meters, so to draw the
-            //// molecule at a comfortable size we made the molecule width 0.2 m (20 cm).
-            //static const VertexPositionColor moleculeVertices[] =
-            //{
-            //    { XMFLOAT3(-0.1f, -0.1f, -0.1f), XMFLOAT3(0.5f, 0.5f, 0.5f) },
-            //    { XMFLOAT3(-0.1f, -0.1f,  0.1f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
-            //    { XMFLOAT3(-0.1f,  0.1f, -0.1f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
-            //    { XMFLOAT3(-0.1f,  0.1f,  0.1f), XMFLOAT3(0.0f, 1.0f, 1.0f) },
-            //    { XMFLOAT3( 0.1f, -0.1f, -0.1f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
-            //    { XMFLOAT3( 0.1f, -0.1f,  0.1f), XMFLOAT3(1.0f, 0.0f, 1.0f) },
-            //    { XMFLOAT3( 0.1f,  0.1f, -0.1f), XMFLOAT3(1.0f, 1.0f, 0.0f) },
-            //    { XMFLOAT3( 0.1f,  0.1f,  0.1f), XMFLOAT3(1.0f, 1.0f, 1.0f) },
-            //};
 
             D3D11_SUBRESOURCE_DATA vertexBufferData = {0};
             //vertexBufferData.pSysMem = moleculeVertices;

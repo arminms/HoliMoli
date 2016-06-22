@@ -4,7 +4,6 @@
 cbuffer ModelConstantBuffer : register(b0)
 {
     float4x4      modelToWorld;
-    float         modelScaling;
 };
 
 // A constant buffer that stores each set of view and projection matrices in column-major format.
@@ -51,7 +50,7 @@ DS_OUTPUT main(
 
     float pi2 = 6.28318530;
     float pi = pi2 / 2.0f;
-    float R = modelScaling;
+    float R = 1.5f;
     float fi = pi * UV.x;
     float theta = pi2 * UV.y;
     float sinFi, cosFi, sinTheta, cosTheta;

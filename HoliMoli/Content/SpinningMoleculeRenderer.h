@@ -48,7 +48,7 @@ namespace HoliMoli
         float                                           m_degreesPerSecond = 1.f;
         Windows::Foundation::Numerics::float3           m_position = { 0.f, 0.f, -2.f };
         float                                           m_scaling = 1.0f;
-        DirectX::XMFLOAT4X4                             m_moleculeTranformation;
+        DirectX::XMFLOAT4X4                             m_moleculeTranform;
 
         // If the current D3D Device supports VPRT, we can avoid using a geometry
         // shader just to set the render target array index
