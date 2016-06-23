@@ -4,6 +4,7 @@
 #include "..\Common\StepTimer.h"
 #include "ShaderStructures.h"
 #include "ElementsColor.h"
+#include "vdWRadii.h"
 
 namespace HoliMoli
 {
@@ -55,6 +56,9 @@ namespace HoliMoli
         bool                                            m_usingVprtShaders = false;
 
         // Elements color
-        elements_color_db<>                             m_elementsColors;
+        elements_color_tb<>                             m_elementsColors;
+
+        // van der Waals radii
+        vdw_radii_tb<>                                  m_vdwRadii;
     };
 }

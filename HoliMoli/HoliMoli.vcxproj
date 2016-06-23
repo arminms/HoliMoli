@@ -85,6 +85,7 @@
     <ClInclude Include="AppView.h" />
     <ClInclude Include="Content\ElementsColor.h" />
     <ClInclude Include="Content\SpinningMoleculeRenderer.h" />
+    <ClInclude Include="Content\vdWRadii.h" />
     <ClInclude Include="HoliMoliMain.h" />
     <ClInclude Include="Common\DeviceResources.h" />
     <ClInclude Include="Common\DirectXHelper.h" />
@@ -111,6 +112,7 @@
     </AppxManifest>
     <None Include="..\README.md" />
     <None Include="Content\ElementsColor.ipp" />
+    <None Include="Content\vdWRadii.ipp" />
     <None Include="HoliMoli_StoreKey.pfx" />
     <None Include="HoliMoli_TemporaryKey.pfx" />
     <None Include="packages.config" />

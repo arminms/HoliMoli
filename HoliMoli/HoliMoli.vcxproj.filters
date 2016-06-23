@@ -60,6 +60,9 @@
     <ClInclude Include="Content\ElementsColor.h">
       <Filter>Content</Filter>
     </ClInclude>
+    <ClInclude Include="Content\vdWRadii.h">
+      <Filter>Content</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Content\VertexShader.hlsl">
@@ -94,6 +97,9 @@
     <None Include="Package.StoreAssociation.xml" />
     <None Include="HoliMoli_StoreKey.pfx" />
     <None Include="Content\ElementsColor.ipp">
+      <Filter>Content</Filter>
+    </None>
+    <None Include="Content\vdWRadii.ipp">
       <Filter>Content</Filter>
     </None>
   </ItemGroup>

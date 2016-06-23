@@ -1,5 +1,5 @@
 template <typename T>
-elements_color_db<T>::elements_color_db()
+elements_color_tb<T>::elements_color_tb()
 {
     m_color =
     {
