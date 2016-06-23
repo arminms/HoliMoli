@@ -29,6 +29,7 @@ struct HS_CONTROL_POINT_OUTPUT
 {
     min16float4 pos    : POSITION;
     min16float3 color  : COLOR0;
+    min16float  vdw    : PSIZE0;
     uint        instId : TEXCOORD0;
 };
 
@@ -51,7 +52,7 @@ DS_OUTPUT main(
 
     float pi2 = 6.28318530;
     float pi = pi2 / 2.0f;
-    float R = 1.5f;
+    float R = quad[0].vdw;
     float fi = pi * UV.x;
     float theta = pi2 * UV.y;
     float sinFi, cosFi, sinTheta, cosTheta;

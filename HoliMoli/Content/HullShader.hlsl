@@ -18,6 +18,7 @@ struct VS_CONTROL_POINT_OUTPUT
 {
     min16float4 pos     : POSITION;
     min16float3 color   : COLOR0;
+    min16float  vdw     : PSIZE0;
     uint        instId  : TEXCOORD0;
 };
 
@@ -26,6 +27,7 @@ struct HS_CONTROL_POINT_OUTPUT
 {
     min16float4 pos     : POSITION;
     min16float3 color   : COLOR0;
+    min16float  vdw     : PSIZE0;
     uint        instId  : TEXCOORD0;
 };
 
@@ -51,7 +53,7 @@ HS_CONSTANT_DATA_OUTPUT CalcHSPatchConstants(
 
     float4 pos = mul(ip[0].pos, modelToWorld);
     pos = mul(pos, viewProjection[ip[0].instId]);
-    float tessFactor = clamp(-2.0f * pos.z + 25.0f, 5, 25);
+    float tessFactor = clamp(-2.0f * pos.z + 32.0f, 5, 32);
 
     // TODO: adding dynamic tessellation factors
     output.EdgeTessFactor[0] =
@@ -78,6 +80,7 @@ HS_CONTROL_POINT_OUTPUT main(
 
     output.pos    = ip[i].pos;
     output.color  = ip[i].color;
+    output.vdw    = ip[i].vdw;
     output.instId = ip[i].instId;
 
     return output;

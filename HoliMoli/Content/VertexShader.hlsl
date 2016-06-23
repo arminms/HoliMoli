@@ -18,6 +18,7 @@ struct VertexShaderInput
 {
     min16float3 pos     : POSITION;
     min16float3 color   : COLOR0;
+    min16float  vdw     : PSIZE0;
     uint        instId  : SV_InstanceID;
 };
 
@@ -28,6 +29,7 @@ struct VertexShaderOutput
 {
     min16float4 pos     : POSITION; // SV_POSITION
     min16float3 color   : COLOR0;
+    min16float  vdw     : PSIZE0;
     uint        viewId  : TEXCOORD0;  // SV_InstanceID % 2
 };
 
@@ -52,6 +54,9 @@ VertexShaderOutput main(VertexShaderInput input)
 
     // Pass the color through without modification.
     output.color = input.color;
+
+    // Pass the vdW radius through without modification.
+    output.vdw = input.vdw;
 
     // Set the instance ID. The pass-through geometry shader will set the
     // render target array index to whatever value is set here.

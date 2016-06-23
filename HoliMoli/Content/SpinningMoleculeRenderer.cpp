@@ -248,8 +248,9 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
 
         static const D3D11_INPUT_ELEMENT_DESC vertexDesc[] =
         {
-            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "COLOR",    0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+            { "COLOR",    0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+            { "PSIZE",    0, DXGI_FORMAT_R32_FLOAT,       0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         };
 
         DX::ThrowIfFailed(
@@ -342,7 +343,7 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
 
         HttpClient^ httpClient = ref new HttpClient();
         auto getPdbTask = create_task(httpClient->GetStringAsync(
-            ref new Windows::Foundation::Uri(L"http://files.rcsb.org/download/1crn.pdb")))
+            ref new Windows::Foundation::Uri(L"http://files.rcsb.org/download/5j3g.pdb")))
         .then([this] (task<Platform::String^> task)
         {
 
@@ -399,6 +400,7 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
                 XMStoreFloat3(&moleculeVertices[i].pos, 
                               XMVectorSet(atm->center().x(), atm->center().y(), atm->center().z(), 1.f));
                 moleculeVertices[i].color = m_elementsColors.m_color[atm->atomic_number()];
+                moleculeVertices[i].vdw   = m_vdwRadii.m_radius[atm->atomic_number()];
             }
 
             D3D11_SUBRESOURCE_DATA vertexBufferData = {0};
