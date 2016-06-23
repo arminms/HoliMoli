@@ -105,8 +105,8 @@ void SpinningMoleculeRenderer::Render()
 
     const auto context = m_deviceResources->GetD3DDeviceContext();
 
-    // Each vertex is one instance of the VertexPositionColor struct.
-    const UINT stride = sizeof(VertexPositionColor);
+    // Each vertex is one instance of the VertexPositionColorVdw struct.
+    const UINT stride = sizeof(VertexPositionColorVdw);
     const UINT offset = 0;
     context->IASetVertexBuffers(
         0,
@@ -353,7 +353,7 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
             auto rt = make<root>();
             is >> rt;
             std::size_t atomsCount = boost::distance(rt->range<atom>());
-            std::vector<VertexPositionColor> moleculeVertices(atomsCount);
+            std::vector<VertexPositionColorVdw> moleculeVertices(atomsCount);
 
             // Finding center of the molecule
             mtl::point3f min, max;
@@ -407,7 +407,7 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
             vertexBufferData.SysMemPitch = 0;
             vertexBufferData.SysMemSlicePitch = 0;
             //const CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(moleculeVertices), D3D11_BIND_VERTEX_BUFFER);
-            const CD3D11_BUFFER_DESC vertexBufferDesc(moleculeVertices.size() * sizeof(VertexPositionColor), D3D11_BIND_VERTEX_BUFFER);
+            const CD3D11_BUFFER_DESC vertexBufferDesc(moleculeVertices.size() * sizeof(VertexPositionColorVdw), D3D11_BIND_VERTEX_BUFFER);
             DX::ThrowIfFailed(
                 m_deviceResources->GetD3DDevice()->CreateBuffer(
                     &vertexBufferDesc,

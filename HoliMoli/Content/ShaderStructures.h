@@ -14,9 +14,10 @@ namespace HoliMoli
 
 
     // Used to send per-vertex data to the vertex shader.
-    struct VertexPositionColor
+    struct VertexPositionColorVdw
     {
         DirectX::XMFLOAT3 pos;
         DirectX::XMFLOAT3 color;
+        float             vdw;
     };
 }
