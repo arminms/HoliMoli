@@ -10,6 +10,7 @@ cbuffer ViewProjectionConstantBuffer : register(b1)
 {
     float4   cameraPosition;
     float4   lightPosition;
+    float4x4 projection;
     float4x4 viewProjection[2];
 };
 
@@ -53,7 +54,16 @@ HS_CONSTANT_DATA_OUTPUT CalcHSPatchConstants(
 
     float4 pos = mul(ip[0].pos, modelToWorld);
     pos = mul(pos, viewProjection[ip[0].instId]);
-    float tessFactor = clamp(-2.0f * pos.z + 32.0f, 5, 32);
+    //pos.z = pos.z / pos.w;
+
+    float4 r = min16float4(ip[0].vdw, 0.f, 0.f, 1.f);
+    r = mul(r, modelToWorld);
+    //r = mul(r, viewProjection[ip[0].instId]);
+    //r.xyz = r / r.w;
+
+    // using w-value that is equal to the z-component prior to the projection
+    float tessFactor = clamp(length(r) / pos.w * projection._11 * 3.f, 5.f, 25.f);
+    //float tessFactor = clamp(length(r) / pos.w * projection._22 * 2.f, 5.f, 25.f);
 
     // TODO: adding dynamic tessellation factors
     output.EdgeTessFactor[0] =
@@ -62,6 +72,7 @@ HS_CONSTANT_DATA_OUTPUT CalcHSPatchConstants(
         output.EdgeTessFactor[3] =
         output.InsideTessFactor[0] = 
         output.InsideTessFactor[1] = tessFactor;
+        //output.InsideTessFactor[1] = 5;
 
     return output;
 }

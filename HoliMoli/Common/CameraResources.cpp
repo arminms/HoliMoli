@@ -193,6 +193,11 @@ void DX::CameraResources::UpdateViewProjectionBuffer(
         // Otherwise, the set of view transforms can be retrieved.
         HolographicStereoTransform viewCoordinateSystemTransform = viewTransformContainer->Value;
 
+        XMStoreFloat4x4(
+            &viewProjectionConstantBufferData.projection,
+            XMMatrixTranspose(XMLoadFloat4x4(&cameraProjectionTransform.Left))
+            );
+ 
         // Update the view matrices. Holographic cameras (such as Microsoft HoloLens) are
         // constantly moving relative to the world. The view matrices need to be updated
         // every frame.

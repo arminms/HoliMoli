@@ -12,6 +12,7 @@ cbuffer ViewProjectionConstantBuffer : register(b1)
 {
     float4   cameraPosition;
     float4   lightPosition;
+    float4x4 projection;
     float4x4 viewProjection[2];
 };
 

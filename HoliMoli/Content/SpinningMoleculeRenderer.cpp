@@ -59,9 +59,9 @@ void SpinningMoleculeRenderer::Update(const DX::StepTimer& timer)
     // Multiply to get the transform matrix.
     // Note that this transform does not enforce a particular coordinate system. The calling
     // class is responsible for rendering this content in a consistent manner.
-    const XMMATRIX moleculeTransform = XMLoadFloat4x4(&m_moleculeTranform);
-    const XMMATRIX modelTransform = XMMatrixMultiply(moleculeTransform, modelRtnSclTrn);
-    const XMMATRIX normalsTransform = XMMatrixMultiply(moleculeTransform, modelRotation);
+    const XMMATRIX atomsTransform = XMLoadFloat4x4(&m_atomsTranform);
+    const XMMATRIX modelTransform = XMMatrixMultiply(atomsTransform, modelRtnSclTrn);
+    const XMMATRIX normalsTransform = XMMatrixMultiply(atomsTransform, modelRotation);
 
     // The view and projection matrices are provided by the system; they are associated
     // with holographic cameras, and updated on a per-camera basis.
@@ -371,6 +371,12 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
             auto extent = mtl::vector3f(min, max);
             m_scaling = 1.0f / mtl::length(extent);
 
+            //// checking scaling factor for debugging
+            //std::wostringstream out;
+            //out.precision(6);
+            //out << L"Scaling: " << m_scaling << std::endl;
+            //OutputDebugString(out.str().c_str());
+
             mtl::point3f center;
             mtl::middle(center, min, max);
             auto trans = mtl::vector3f(center, mtl::point3f(0.f, 0.f, 0.f));
@@ -391,7 +397,7 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
 
             // final multiplications and storing
             const XMMATRIX trNRot = XMMatrixMultiply(tr, ro);
-            XMStoreFloat4x4(&m_moleculeTranform, trNRot);
+            XMStoreFloat4x4(&m_atomsTranform, trNRot);
             //XMStoreFloat4x4(&m_moleculeTranform, tr);
 
             // Load atoms as vertices. Each vertex has a position and a color.
