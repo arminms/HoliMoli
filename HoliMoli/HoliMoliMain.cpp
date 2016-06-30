@@ -10,6 +10,7 @@ using namespace HoliMoli;
 
 using namespace concurrency;
 using namespace Platform;
+using namespace DirectX;
 using namespace Windows::Foundation;
 using namespace Windows::Foundation::Numerics;
 using namespace Windows::Graphics::Holographic;
@@ -21,6 +22,14 @@ using namespace std::placeholders;
 HoliMoliMain::HoliMoliMain(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
     m_deviceResources(deviceResources)
 {
+    // Initializing sound.
+    AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
+#ifdef _DEBUG
+    eflags = eflags | AudioEngine_Debug;
+#endif
+    m_audioEngine = std::make_unique<AudioEngine>(eflags);
+    m_waveBank = std::make_unique<WaveBank>(m_audioEngine.get(), L"Assets/Sounds.xwb");
+
     // Register to be notified if the device is lost or recreated.
     m_deviceResources->RegisterDeviceNotify(this);
 }
@@ -157,6 +166,9 @@ HolographicFrame^ HoliMoliMain::Update()
     SpatialInteractionSourceState^ pointerState = m_spatialInputHandler->CheckForInput();
     if (pointerState != nullptr)
     {
+        // Playing click sound
+        m_waveBank->Play(0);
+
         // When a Pressed gesture is detected, the sample hologram will be repositioned
         // two meters in front of the user.
         m_spinningMoleculeRenderer->PositionHologram(

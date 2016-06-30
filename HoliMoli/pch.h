@@ -22,6 +22,7 @@
 #include <mutex>
 
 // DirectXTK headers
+#include <Audio.h>
 #include <CommonStates.h>
 
 // Maral headers

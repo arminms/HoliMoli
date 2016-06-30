@@ -69,30 +69,34 @@ namespace HoliMoli
 #ifdef DRAW_SAMPLE_CONTENT
         // Renders a colorful holographic molecule that's 20 centimeters wide. This sample content
         // is used to demonstrate world-locked rendering.
-        std::unique_ptr<SpinningMoleculeRenderer>                           m_spinningMoleculeRenderer;
+        std::unique_ptr<SpinningMoleculeRenderer>                        m_spinningMoleculeRenderer;
 
         // Listens for the Pressed spatial input event.
-        std::shared_ptr<SpatialInputHandler>                            m_spatialInputHandler;
+        std::shared_ptr<SpatialInputHandler>                             m_spatialInputHandler;
 #endif
 
         // Cached pointer to device resources.
-        std::shared_ptr<DX::DeviceResources>                            m_deviceResources;
+        std::shared_ptr<DX::DeviceResources>                             m_deviceResources;
 
         // Render loop timer.
-        DX::StepTimer                                                   m_timer;
+        DX::StepTimer                                                    m_timer;
 
         // Represents the holographic space around the user.
-        Windows::Graphics::Holographic::HolographicSpace^               m_holographicSpace;
+        Windows::Graphics::Holographic::HolographicSpace^                m_holographicSpace;
 
         // SpatialLocator that is attached to the primary camera.
-        Windows::Perception::Spatial::SpatialLocator^                   m_locator;
+        Windows::Perception::Spatial::SpatialLocator^                    m_locator;
 
         // A reference frame attached to the holographic camera.
         Windows::Perception::Spatial::SpatialStationaryFrameOfReference^ m_referenceFrame;
 
         // Event registration tokens.
-        Windows::Foundation::EventRegistrationToken                     m_cameraAddedToken;
-        Windows::Foundation::EventRegistrationToken                     m_cameraRemovedToken;
-        Windows::Foundation::EventRegistrationToken                     m_locatabilityChangedToken;
+        Windows::Foundation::EventRegistrationToken                      m_cameraAddedToken;
+        Windows::Foundation::EventRegistrationToken                      m_cameraRemovedToken;
+        Windows::Foundation::EventRegistrationToken                      m_locatabilityChangedToken;
+
+        // Sound related stuff.
+        std::unique_ptr<DirectX::AudioEngine>                            m_audioEngine;
+        std::unique_ptr<DirectX::WaveBank>                               m_waveBank;
     };
 }
