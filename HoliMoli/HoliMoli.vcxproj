@@ -111,6 +111,11 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="..\README.md" />
+    <Media Include="Assets\Sounds.xwb">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </Media>
     <None Include="Content\ElementsColor.ipp" />
     <None Include="Content\vdWRadii.ipp" />
     <None Include="HoliMoli_StoreKey.pfx" />

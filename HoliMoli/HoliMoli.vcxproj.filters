@@ -102,6 +102,9 @@
     <None Include="Content\vdWRadii.ipp">
       <Filter>Content</Filter>
     </None>
+    <None Include="Assets\Sounds.xwb">
+      <Filter>Assets</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\LockScreenLogo.scale-100.png">
