@@ -167,7 +167,7 @@ HolographicFrame^ HoliMoliMain::Update()
     if (pointerState != nullptr)
     {
         // Playing click sound
-        m_waveBank->Play(0);
+        m_waveBank->Play(2);
 
         // When a Pressed gesture is detected, the sample hologram will be repositioned
         // two meters in front of the user.
