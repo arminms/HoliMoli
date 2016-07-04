@@ -26,13 +26,14 @@ void SpinningMoleculeRenderer::PositionHologram(SpatialPointerPose^ pointerPose)
         const float3 headPosition    = pointerPose->Head->Position;
         const float3 headDirection   = pointerPose->Head->ForwardDirection;
 
-        // The hologram is positioned five meters along the user's gaze direction.
-        static const float distanceFromUser = 1.5f; // meters
-        const float3 gazeAtTwoMeters        = headPosition + (distanceFromUser * headDirection);
+        // The hologram is positioned along the user's gaze direction.
+        static const float distanceFromUser = 2.0f; // meters
+        //static const float distanceFromUser = GetDistance(); // meters
+        const float3 gazeAtMolecule         = headPosition + (distanceFromUser * headDirection);
 
         // This will be used as the translation component of the hologram's
         // model transform.
-        SetPosition(gazeAtTwoMeters);
+        SetPosition(gazeAtMolecule);
     }
 }
 

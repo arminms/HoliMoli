@@ -111,6 +111,8 @@ void HoliMoliMain::CreateSpeechConstraintsForCurrentState()
     m_speechCommandList = ref new Platform::Collections::Vector<String^>();
     m_speechCommandList->Append(StringReference(L"bigger"));
     m_speechCommandList->Append(StringReference(L"smaller"));
+    m_speechCommandList->Append(StringReference(L"closer"));
+    m_speechCommandList->Append(StringReference(L"farther"));
 
     m_speechRecognizer = ref new SpeechRecognizer();
     SpeechRecognitionListConstraint^ spConstraint = ref new SpeechRecognitionListConstraint(m_speechCommandList);
@@ -138,10 +140,19 @@ void HoliMoliMain::CreateSpeechConstraintsForCurrentState()
 void HoliMoliMain::OnResultGenerated(SpeechContinuousRecognitionSession^ sender,
     SpeechContinuousRecognitionResultGeneratedEventArgs^ args)
 {
-    if (args->Result->RawConfidence > 0.5f && args->Result->Text == L"bigger")
-        m_spinningMoleculeRenderer->SetScaling(m_spinningMoleculeRenderer->GetScaling() * 2.f);
-    else if (args->Result->RawConfidence > 0.5f && args->Result->Text == L"smaller")
-        m_spinningMoleculeRenderer->SetScaling(m_spinningMoleculeRenderer->GetScaling() * 0.5f);
+    if (args->Result->RawConfidence > 0.5f)
+    {
+        if (args->Result->Text == L"bigger")
+            m_spinningMoleculeRenderer->SetScaling(m_spinningMoleculeRenderer->GetScaling() * 2.f);
+        else if (args->Result->Text == L"smaller")
+            m_spinningMoleculeRenderer->SetScaling(m_spinningMoleculeRenderer->GetScaling() * 0.5f);
+        else if (args->Result->Text == L"closer")
+            m_spinningMoleculeRenderer->SetDistance(m_spinningMoleculeRenderer->GetDistance() - 0.5f);
+        else if (args->Result->Text == L"farther")
+            m_spinningMoleculeRenderer->SetDistance(m_spinningMoleculeRenderer->GetDistance() + 0.5f);
+        else
+            m_waveBank->Play(1);
+    }
     else
         m_waveBank->Play(1);
 }
@@ -213,7 +224,7 @@ HolographicFrame^ HoliMoliMain::Update()
         m_waveBank->Play(2);
 
         // When a Pressed gesture is detected, the sample hologram will be repositioned
-        // two meters in front of the user.
+        // in front of the user.
         m_spinningMoleculeRenderer->PositionHologram(
             pointerState->TryGetPointerPose(currentCoordinateSystem)
             );

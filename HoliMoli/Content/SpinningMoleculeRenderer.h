@@ -28,6 +28,11 @@ namespace HoliMoli
         void SetScaling(float sc) { m_scaling = sc; }
         float GetScaling() const { return m_scaling; }
 
+        void SetDistance(float d) { m_position.z = -d; }
+        float GetDistance() const { return std::abs(m_position.z); }
+        //void SetDistance(float d) { m_distance = d < 1.f ? 1.f : d; }
+        //float GetDistance() const { return m_distance; }
+
     private:
         // Cached pointer to device resources
         std::shared_ptr<DX::DeviceResources>            m_deviceResources;
@@ -51,6 +56,7 @@ namespace HoliMoli
         bool                                            m_loadingComplete = false;
         float                                           m_degreesPerSecond = 2.0f;
         Windows::Foundation::Numerics::float3           m_position = { 0.f, 0.f, -2.f };
+        //float                                           m_distance = 2.f;
         float                                           m_scaling = 1.0f;
         DirectX::XMFLOAT4X4                             m_atomsTranform;
 
