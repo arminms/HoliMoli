@@ -16,6 +16,7 @@ using namespace Windows::Foundation::Numerics;
 using namespace Windows::Graphics::Holographic;
 using namespace Windows::Perception::Spatial;
 using namespace Windows::UI::Input::Spatial;
+using namespace Windows::Media::SpeechRecognition;
 using namespace std::placeholders;
 
 // Loads and initializes application assets when the application is loaded.
@@ -32,6 +33,8 @@ HoliMoliMain::HoliMoliMain(const std::shared_ptr<DX::DeviceResources>& deviceRes
 
     // Register to be notified if the device is lost or recreated.
     m_deviceResources->RegisterDeviceNotify(this);
+
+    CreateSpeechConstraintsForCurrentState();
 }
 
 void HoliMoliMain::SetHolographicSpace(HolographicSpace^ holographicSpace)
@@ -101,6 +104,46 @@ void HoliMoliMain::SetHolographicSpace(HolographicSpace^ holographicSpace)
     //   indicates to be of special interest. Anchor positions do not drift, but can be corrected; the
     //   anchor will use the corrected position starting in the next frame after the correction has
     //   occurred.
+}
+
+void HoliMoliMain::CreateSpeechConstraintsForCurrentState()
+{
+    m_speechCommandList = ref new Platform::Collections::Vector<String^>();
+    m_speechCommandList->Append(StringReference(L"bigger"));
+    m_speechCommandList->Append(StringReference(L"smaller"));
+
+    m_speechRecognizer = ref new SpeechRecognizer();
+    SpeechRecognitionListConstraint^ spConstraint = ref new SpeechRecognitionListConstraint(m_speechCommandList);
+    m_speechRecognizer->Constraints->Clear();
+    m_speechRecognizer->Constraints->Append(spConstraint);
+    create_task(m_speechRecognizer->CompileConstraintsAsync()).then([this](SpeechRecognitionCompilationResult^ compilationResult)
+    {
+        if (compilationResult->Status == SpeechRecognitionResultStatus::Success)
+        {
+            m_speechRecognizer->ContinuousRecognitionSession->StartAsync();
+        }
+        else
+        {
+            // play error sound
+            m_waveBank->Play(1);
+        }
+    });
+
+    m_speechRecognizer->ContinuousRecognitionSession->ResultGenerated +=
+       ref new TypedEventHandler<SpeechContinuousRecognitionSession^, SpeechContinuousRecognitionResultGeneratedEventArgs^>(
+           std::bind(&HoliMoliMain::OnResultGenerated, this, _1, _2)
+           );
+}
+
+void HoliMoliMain::OnResultGenerated(SpeechContinuousRecognitionSession^ sender,
+    SpeechContinuousRecognitionResultGeneratedEventArgs^ args)
+{
+    if (args->Result->RawConfidence > 0.5f && args->Result->Text == L"bigger")
+        m_spinningMoleculeRenderer->SetScaling(m_spinningMoleculeRenderer->GetScaling() * 2.f);
+    else if (args->Result->RawConfidence > 0.5f && args->Result->Text == L"smaller")
+        m_spinningMoleculeRenderer->SetScaling(m_spinningMoleculeRenderer->GetScaling() * 0.5f);
+    else
+        m_waveBank->Play(1);
 }
 
 void HoliMoliMain::UnregisterHolographicEventHandlers()

@@ -25,6 +25,9 @@ namespace HoliMoli
         void SetPosition(Windows::Foundation::Numerics::float3 pos) { m_position = pos;  }
         Windows::Foundation::Numerics::float3 GetPosition()         { return m_position; }
 
+        void SetScaling(float sc) { m_scaling = sc; }
+        float GetScaling() const { return m_scaling; }
+
     private:
         // Cached pointer to device resources
         std::shared_ptr<DX::DeviceResources>            m_deviceResources;

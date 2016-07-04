@@ -20,6 +20,7 @@
 #include <memory>
 #include <map>
 #include <mutex>
+#include <collection.h>
 
 // DirectXTK headers
 #include <Audio.h>

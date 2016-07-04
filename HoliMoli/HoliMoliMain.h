@@ -31,6 +31,11 @@ namespace HoliMoli
         // for the app.
         void SetHolographicSpace(Windows::Graphics::Holographic::HolographicSpace^ holographicSpace);
 
+        // Creates a list of speech commands for the recognizer to listen for. 
+        void CreateSpeechConstraintsForCurrentState();
+        void OnResultGenerated(Windows::Media::SpeechRecognition::SpeechContinuousRecognitionSession^ sender,
+                               Windows::Media::SpeechRecognition::SpeechContinuousRecognitionResultGeneratedEventArgs^ args);
+
         // Starts the holographic frame and updates the content.
         Windows::Graphics::Holographic::HolographicFrame^ Update();
 
@@ -98,5 +103,9 @@ namespace HoliMoli
         // Sound related stuff.
         std::unique_ptr<DirectX::AudioEngine>                            m_audioEngine;
         std::unique_ptr<DirectX::WaveBank>                               m_waveBank;
+
+        // Voice input stuff.
+        Windows::Media::SpeechRecognition::SpeechRecognizer^             m_speechRecognizer;
+        Platform::Collections::Vector<Platform::String^>^                m_speechCommandList;
     };
 }
