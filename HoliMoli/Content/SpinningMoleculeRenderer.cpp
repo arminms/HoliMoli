@@ -43,9 +43,11 @@ void SpinningMoleculeRenderer::Update(const DX::StepTimer& timer)
 {
     // Rotate the molecule.
     // Convert degrees to radians, then convert seconds to rotation angle.
-    const float    radiansPerSecond = XMConvertToRadians(m_degreesPerSecond);
-    const double   totalRotation    = timer.GetTotalSeconds() * radiansPerSecond;
-    const float    radians          = static_cast<float>(fmod(totalRotation, XM_2PI));
+    const float    radiansPerFrame  = XMConvertToRadians(m_degreesPerFrame);
+    //const double   totalRotation    = timer.GetTotalSeconds() * radiansPerFrame;
+    //const float    radians          = static_cast<float>(fmod(totalRotation, XM_2PI));
+    m_totalRotation                += radiansPerFrame; // / (timer.GetFramesPerSecond() < 0.0001 ? 60 : timer.GetFramesPerSecond());
+    const float    radians          = static_cast<float>(fmod(m_totalRotation, XM_2PI));
     const XMMATRIX modelRotation    = XMMatrixRotationY(-radians);
 
     // Scaling the molecule.

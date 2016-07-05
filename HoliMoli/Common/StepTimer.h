@@ -14,7 +14,8 @@ namespace DX
             m_framesPerSecond(0),
             m_framesThisSecond(0),
             m_qpcSecondCounter(0),
-            m_isFixedTimeStep(false),
+            //m_isFixedTimeStep(true), // original
+            m_isFixedTimeStep(true),
             m_targetElapsedTicks(TicksPerSecond / 60)
         {
             m_qpcFrequency = GetPerformanceFrequency();

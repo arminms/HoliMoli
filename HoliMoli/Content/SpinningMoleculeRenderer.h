@@ -33,6 +33,9 @@ namespace HoliMoli
         //void SetDistance(float d) { m_distance = d < 1.f ? 1.f : d; }
         //float GetDistance() const { return m_distance; }
 
+        void SetRotationSpeed(float a) { m_degreesPerFrame = a < 0.f ? 0.f : a; }
+        float GetRotationSpeed() const { return m_degreesPerFrame; }
+
     private:
         // Cached pointer to device resources
         std::shared_ptr<DX::DeviceResources>            m_deviceResources;
@@ -54,7 +57,8 @@ namespace HoliMoli
 
         // Variables used with the rendering loop
         bool                                            m_loadingComplete = false;
-        float                                           m_degreesPerSecond = 2.0f;
+        float                                           m_degreesPerFrame = 0.05;
+        double                                          m_totalRotation = 0.0;
         Windows::Foundation::Numerics::float3           m_position = { 0.f, 0.f, -2.f };
         //float                                           m_distance = 2.f;
         float                                           m_scaling = 1.0f;
