@@ -107,5 +107,6 @@ namespace HoliMoli
         // Voice input stuff.
         Windows::Media::SpeechRecognition::SpeechRecognizer^             m_speechRecognizer;
         Platform::Collections::Vector<Platform::String^>^                m_speechCommandList;
+        bool                                                             m_repositionMolecule = false;
     };
 }

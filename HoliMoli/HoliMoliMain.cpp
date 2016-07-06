@@ -149,9 +149,15 @@ void HoliMoliMain::OnResultGenerated(SpeechContinuousRecognitionSession^ sender,
         else if (args->Result->Text == L"smaller")
             m_spinningMoleculeRenderer->SetScaling(m_spinningMoleculeRenderer->GetScaling() * 0.5f);
         else if (args->Result->Text == L"closer")
-            m_spinningMoleculeRenderer->SetDistance(m_spinningMoleculeRenderer->GetDistance() - 0.5f);
+        {
+            m_spinningMoleculeRenderer->SetDistance(m_spinningMoleculeRenderer->GetDistance() * 0.5f);
+            m_repositionMolecule = true;
+        }
         else if (args->Result->Text == L"farther")
-            m_spinningMoleculeRenderer->SetDistance(m_spinningMoleculeRenderer->GetDistance() + 0.5f);
+        {
+            m_spinningMoleculeRenderer->SetDistance(m_spinningMoleculeRenderer->GetDistance() * 2.f);
+            m_repositionMolecule = true;
+        }
         else if (args->Result->Text == L"slower")
             m_spinningMoleculeRenderer->SetRotationSpeed(m_spinningMoleculeRenderer->GetRotationSpeed() * 0.5f);
         else if (args->Result->Text == L"faster")
@@ -220,6 +226,14 @@ HolographicFrame^ HoliMoliMain::Update()
     // associated with the current frame. Later, this coordinate system is used for
     // for creating the stereo view matrices when rendering the sample content.
     SpatialCoordinateSystem^ currentCoordinateSystem = m_referenceFrame->CoordinateSystem;
+
+    // Reposition the molecule if necessary.
+    if (m_repositionMolecule)
+    {
+        SpatialPointerPose^ pose = SpatialPointerPose::TryGetAtTimestamp(currentCoordinateSystem, prediction->Timestamp);
+        m_spinningMoleculeRenderer->PositionHologram(pose);
+        m_repositionMolecule = false;
+    }
 
 #ifdef DRAW_SAMPLE_CONTENT
     // Check for new input state since the last frame.
