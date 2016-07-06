@@ -33,6 +33,8 @@ namespace HoliMoli
 
         // Creates a list of speech commands for the recognizer to listen for. 
         void CreateSpeechConstraintsForCurrentState();
+        void OnSpeechQualityDegraded(Windows::Media::SpeechRecognition::SpeechRecognizer^ recognizer,
+                                     Windows::Media::SpeechRecognition::SpeechRecognitionQualityDegradingEventArgs^ args);
         void OnResultGenerated(Windows::Media::SpeechRecognition::SpeechContinuousRecognitionSession^ sender,
                                Windows::Media::SpeechRecognition::SpeechContinuousRecognitionResultGeneratedEventArgs^ args);
 

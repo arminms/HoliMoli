@@ -109,6 +109,7 @@ void HoliMoliMain::SetHolographicSpace(HolographicSpace^ holographicSpace)
 void HoliMoliMain::CreateSpeechConstraintsForCurrentState()
 {
     m_speechCommandList = ref new Platform::Collections::Vector<String^>();
+    m_speechCommandList->Append(StringReference(L"help"));
     m_speechCommandList->Append(StringReference(L"bigger"));
     m_speechCommandList->Append(StringReference(L"smaller"));
     m_speechCommandList->Append(StringReference(L"closer"));
@@ -133,10 +134,57 @@ void HoliMoliMain::CreateSpeechConstraintsForCurrentState()
         }
     });
 
+    m_speechRecognizer->RecognitionQualityDegrading +=
+       ref new TypedEventHandler<SpeechRecognizer^, SpeechRecognitionQualityDegradingEventArgs^>(
+           std::bind(&HoliMoliMain::OnSpeechQualityDegraded, this, _1, _2)
+           );
+
     m_speechRecognizer->ContinuousRecognitionSession->ResultGenerated +=
        ref new TypedEventHandler<SpeechContinuousRecognitionSession^, SpeechContinuousRecognitionResultGeneratedEventArgs^>(
            std::bind(&HoliMoliMain::OnResultGenerated, this, _1, _2)
            );
+}
+
+void HoliMoliMain::OnSpeechQualityDegraded(SpeechRecognizer^ recognizer, SpeechRecognitionQualityDegradingEventArgs^ args)
+{
+       switch (args->Problem)
+       {
+       case SpeechRecognitionAudioProblem::TooFast:
+           m_waveBank->Play(10);
+           OutputDebugStringW(L"The user spoke too quickly.\n");
+           break;
+
+       case SpeechRecognitionAudioProblem::TooSlow:
+           m_waveBank->Play(11);
+           OutputDebugStringW(L"The user spoke too slowly.\n");
+           break;
+
+       case SpeechRecognitionAudioProblem::TooQuiet:
+           m_waveBank->Play(12);
+           OutputDebugStringW(L"The user spoke too softly.\n");
+           break;
+
+       case SpeechRecognitionAudioProblem::TooLoud:
+           m_waveBank->Play(13);
+           OutputDebugStringW(L"The user spoke too loudly.\n");
+           break;
+
+       case SpeechRecognitionAudioProblem::TooNoisy:
+           m_waveBank->Play(14);
+           OutputDebugStringW(L"There is too much noise in the signal.\n");
+           break;
+
+       case SpeechRecognitionAudioProblem::NoSignal:
+           m_waveBank->Play(15);
+           OutputDebugStringW(L"There is no signal.\n");
+           break;
+
+       case SpeechRecognitionAudioProblem::None:
+       default:
+           m_waveBank->Play(16);
+           OutputDebugStringW(L"An error was reported with no information.\n");
+           break;
+       }
 }
 
 void HoliMoliMain::OnResultGenerated(SpeechContinuousRecognitionSession^ sender,
@@ -162,6 +210,8 @@ void HoliMoliMain::OnResultGenerated(SpeechContinuousRecognitionSession^ sender,
             m_spinningMoleculeRenderer->SetRotationSpeed(m_spinningMoleculeRenderer->GetRotationSpeed() * 0.5f);
         else if (args->Result->Text == L"faster")
             m_spinningMoleculeRenderer->SetRotationSpeed(m_spinningMoleculeRenderer->GetRotationSpeed() * 2.0f);
+        else if (args->Result->Text == L"help")
+            m_waveBank->Play(17);
         else
             m_waveBank->Play(1);
     }
