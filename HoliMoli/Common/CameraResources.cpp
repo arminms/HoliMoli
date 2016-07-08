@@ -216,7 +216,8 @@ void DX::CameraResources::UpdateViewProjectionBuffer(
         {
             // Use the camera position as a light source.
             float4 cameraPosition = float4(viewInverse.m41, viewInverse.m42, viewInverse.m43, 0.f);
-            float4 lightPosition = cameraPosition + float4(-1.5f, 2.f, 0.f, 0.f);
+            float4 cameraOrientation = float4(viewCoordinateSystemTransform.Left.m13, viewCoordinateSystemTransform.Left.m23, viewCoordinateSystemTransform.Left.m33, 0.f);
+            float4 lightPosition = cameraPosition + (cameraOrientation * 10.f);
 
             XMStoreFloat4(&viewProjectionConstantBufferData.cameraPosition, DirectX::XMLoadFloat4(&cameraPosition));
             XMStoreFloat4(&viewProjectionConstantBufferData.lightPosition, DirectX::XMLoadFloat4(&lightPosition));
