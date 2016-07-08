@@ -146,6 +146,12 @@ void HoliMoliMain::CreateSpeechConstraintsForCurrentState()
            );
 }
 
+void HoliMoliMain::ReleaseSpeechConstraintsForCurrentState()
+{
+    delete m_speechRecognizer;
+    m_speechCommandList->Clear();
+}
+
 void HoliMoliMain::OnSpeechQualityDegraded(SpeechRecognizer^ recognizer, SpeechRecognitionQualityDegradingEventArgs^ args)
 {
        switch (args->Problem)
@@ -469,6 +475,7 @@ void HoliMoliMain::LoadAppState()
 void HoliMoliMain::OnDeviceLost()
 {
 #ifdef DRAW_SAMPLE_CONTENT
+    ReleaseSpeechConstraintsForCurrentState();
     m_spinningMoleculeRenderer->ReleaseDeviceDependentResources();
 #endif
 }
@@ -478,6 +485,7 @@ void HoliMoliMain::OnDeviceLost()
 void HoliMoliMain::OnDeviceRestored()
 {
 #ifdef DRAW_SAMPLE_CONTENT
+    CreateSpeechConstraintsForCurrentState();
     m_spinningMoleculeRenderer->CreateDeviceDependentResources();
 #endif
 }
