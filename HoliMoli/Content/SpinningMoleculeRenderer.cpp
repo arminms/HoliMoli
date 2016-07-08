@@ -371,7 +371,8 @@ void SpinningMoleculeRenderer::CreateDeviceDependentResources()
             // Windows Holographic is scaled in meters, so to draw the molecule
             // at a comfortable size we made the molecule width 0.2 m (20 cm).
             auto extent = mtl::vector3f(min, max);
-            m_scaling = 1.0f / mtl::length(extent);
+            m_defaultScaling = 1.0f / mtl::length(extent);
+            m_scaling = m_defaultScaling;
 
             //// checking scaling factor for debugging
             //std::wostringstream out;

@@ -116,6 +116,7 @@ void HoliMoliMain::CreateSpeechConstraintsForCurrentState()
     m_speechCommandList->Append(StringReference(L"farther"));
     m_speechCommandList->Append(StringReference(L"slower"));
     m_speechCommandList->Append(StringReference(L"faster"));
+    m_speechCommandList->Append(StringReference(L"reset"));
 
     m_speechRecognizer = ref new SpeechRecognizer();
     SpeechRecognitionListConstraint^ spConstraint = ref new SpeechRecognitionListConstraint(m_speechCommandList);
@@ -210,6 +211,13 @@ void HoliMoliMain::OnResultGenerated(SpeechContinuousRecognitionSession^ sender,
             m_spinningMoleculeRenderer->SetRotationSpeed(m_spinningMoleculeRenderer->GetRotationSpeed() * 0.5f);
         else if (args->Result->Text == L"faster")
             m_spinningMoleculeRenderer->SetRotationSpeed(m_spinningMoleculeRenderer->GetRotationSpeed() * 2.0f);
+        else if (args->Result->Text == L"reset")
+        {
+            m_spinningMoleculeRenderer->SetDefaultScaling();
+            m_spinningMoleculeRenderer->SetDefaultDistance();
+            m_spinningMoleculeRenderer->SetDefaultRotationSpeed();
+            m_repositionMolecule = true;
+        }
         else if (args->Result->Text == L"help")
             m_waveBank->Play(17);
         else

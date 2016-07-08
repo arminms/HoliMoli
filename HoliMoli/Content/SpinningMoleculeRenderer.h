@@ -26,14 +26,15 @@ namespace HoliMoli
         Windows::Foundation::Numerics::float3 GetPosition()         { return m_position; }
 
         void SetScaling(float sc) { m_scaling = sc; }
+        void SetDefaultScaling() { m_scaling = m_defaultScaling; }
         float GetScaling() const { return m_scaling; }
 
-        //void SetDistance(float d) { m_position.z = -d; }
-        //float GetDistance() const { return std::abs(m_position.z); }
         void SetDistance(float d) { m_distance = d < 0.5f ? 0.5f : d; }
+        void SetDefaultDistance() { m_distance = 2.f; }
         float GetDistance() const { return m_distance; }
 
         void SetRotationSpeed(float a) { m_degreesPerFrame = a < 0.f ? 0.f : a; }
+        void SetDefaultRotationSpeed() { m_degreesPerFrame = 0.05f; }
         float GetRotationSpeed() const { return m_degreesPerFrame; }
 
     private:
@@ -61,7 +62,8 @@ namespace HoliMoli
         double                                          m_totalRotation = 0.0;
         Windows::Foundation::Numerics::float3           m_position = { 0.f, 0.f, -2.f };
         float                                           m_distance = 2.f;
-        float                                           m_scaling = 1.0f;
+        float                                           m_scaling = 0.1f;
+        float                                           m_defaultScaling = 0.1f;
         DirectX::XMFLOAT4X4                             m_atomsTranform;
 
         // If the current D3D Device supports VPRT, we can avoid using a geometry
