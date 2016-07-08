@@ -43,16 +43,10 @@ void HoliMoliMain::SetHolographicSpace(HolographicSpace^ holographicSpace)
 
     m_holographicSpace = holographicSpace;
 
-    //
-    // TODO: Add code here to initialize your holographic content.
-    //
-
-#ifdef DRAW_SAMPLE_CONTENT
     // Initialize the sample hologram.
     m_spinningMoleculeRenderer = std::make_unique<SpinningMoleculeRenderer>(m_deviceResources);
 
     m_spatialInputHandler = std::make_unique<SpatialInputHandler>();
-#endif
 
     // Use the default SpatialLocator to track the motion of the device.
     m_locator = SpatialLocator::GetDefault();
@@ -299,7 +293,6 @@ HolographicFrame^ HoliMoliMain::Update()
         m_repositionMolecule = false;
     }
 
-#ifdef DRAW_SAMPLE_CONTENT
     // Check for new input state since the last frame.
     SpatialInteractionSourceState^ pointerState = m_spatialInputHandler->CheckForInput();
     if (pointerState != nullptr)
@@ -313,7 +306,6 @@ HolographicFrame^ HoliMoliMain::Update()
             pointerState->TryGetPointerPose(currentCoordinateSystem)
             );
     }
-#endif
 
     m_timer.Tick([&] ()
     {
@@ -325,9 +317,7 @@ HolographicFrame^ HoliMoliMain::Update()
         // run as many times as needed to get to the current step.
         //
 
-#ifdef DRAW_SAMPLE_CONTENT
         m_spinningMoleculeRenderer->Update(m_timer);
-#endif
     });
 
     // We complete the frame update by using information about our content positioning
@@ -335,7 +325,6 @@ HolographicFrame^ HoliMoliMain::Update()
 
     for (auto cameraPose : prediction->CameraPoses)
     {
-#ifdef DRAW_SAMPLE_CONTENT
         // The HolographicCameraRenderingParameters class provides access to set
         // the image stabilization parameters.
         HolographicCameraRenderingParameters^ renderingParameters = holographicFrame->GetRenderingParameters(cameraPose);
@@ -352,7 +341,6 @@ HolographicFrame^ HoliMoliMain::Update()
             currentCoordinateSystem,
             m_spinningMoleculeRenderer->GetPosition()
             );
-#endif
     }
 
     // The holographic frame will be used to get up-to-date view and projection matrices and
@@ -433,16 +421,13 @@ bool HoliMoliMain::Render(Windows::Graphics::Holographic::HolographicFrame^ holo
             // Attach the view/projection constant buffer for this camera to the graphics pipeline.
             bool cameraActive = pCameraResources->AttachViewProjectionBuffer(m_deviceResources);
 
-#ifdef DRAW_SAMPLE_CONTENT
             // Only render world-locked content when positional tracking is active.
             if (cameraActive)
             {
-                // Draw the sample hologram.
                 //auto states = std::make_unique<DirectX::CommonStates>(m_deviceResources->GetD3DDevice());
                 //m_deviceResources->GetD3DDeviceContext()->RSSetState(states->Wireframe());
                 m_spinningMoleculeRenderer->Render();
             }
-#endif
             atLeastOneCameraRendered = true;
         }
 
@@ -474,20 +459,16 @@ void HoliMoliMain::LoadAppState()
 // need to be released before this method returns.
 void HoliMoliMain::OnDeviceLost()
 {
-#ifdef DRAW_SAMPLE_CONTENT
     ReleaseSpeechConstraintsForCurrentState();
     m_spinningMoleculeRenderer->ReleaseDeviceDependentResources();
-#endif
 }
 
 // Notifies classes that use Direct3D device resources that the device resources
 // may now be recreated.
 void HoliMoliMain::OnDeviceRestored()
 {
-#ifdef DRAW_SAMPLE_CONTENT
     CreateSpeechConstraintsForCurrentState();
     m_spinningMoleculeRenderer->CreateDeviceDependentResources();
-#endif
 }
 
 void HoliMoliMain::OnLocatabilityChanged(SpatialLocator^ sender, Object^ args)

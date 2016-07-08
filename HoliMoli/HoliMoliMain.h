@@ -1,22 +1,10 @@
 #pragma once
 
-//
-// Comment out this preprocessor definition to disable all of the
-// sample content.
-//
-// To remove the content after disabling it:
-//     * Remove the unused code from your app's Main class.
-//     * Delete the Content folder provided with this template.
-//
-#define DRAW_SAMPLE_CONTENT
-
 #include "Common\DeviceResources.h"
 #include "Common\StepTimer.h"
 
-#ifdef DRAW_SAMPLE_CONTENT
 #include "Content\SpinningMoleculeRenderer.h"
 #include "Content\SpatialInputHandler.h"
-#endif
 
 // Updates, renders, and presents holographic content using Direct3D.
 namespace HoliMoli
@@ -74,14 +62,12 @@ namespace HoliMoli
         // and when tearing down AppMain.
         void UnregisterHolographicEventHandlers();
 
-#ifdef DRAW_SAMPLE_CONTENT
         // Renders a colorful holographic molecule that's 20 centimeters wide. This sample content
         // is used to demonstrate world-locked rendering.
         std::unique_ptr<SpinningMoleculeRenderer>                        m_spinningMoleculeRenderer;
 
         // Listens for the Pressed spatial input event.
         std::shared_ptr<SpatialInputHandler>                             m_spatialInputHandler;
-#endif
 
         // Cached pointer to device resources.
         std::shared_ptr<DX::DeviceResources>                             m_deviceResources;

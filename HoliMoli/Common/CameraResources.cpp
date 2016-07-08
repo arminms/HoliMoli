@@ -222,7 +222,7 @@ void DX::CameraResources::UpdateViewProjectionBuffer(
             XMStoreFloat4(&viewProjectionConstantBufferData.cameraPosition, DirectX::XMLoadFloat4(&cameraPosition));
             XMStoreFloat4(&viewProjectionConstantBufferData.lightPosition, DirectX::XMLoadFloat4(&lightPosition));
         }
-   }
+    }
 
     // Use the D3D device context to update Direct3D device-based resources.
     const auto context = deviceResources->GetD3DDeviceContext();
