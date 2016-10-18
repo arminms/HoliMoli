@@ -111,6 +111,7 @@ void HoliMoliMain::CreateSpeechConstraintsForCurrentState()
     m_speechCommandList->Append(StringReference(L"slower"));
     m_speechCommandList->Append(StringReference(L"faster"));
     m_speechCommandList->Append(StringReference(L"reset"));
+    m_speechCommandList->Append(StringReference(L"makeitbigger"));
 
     m_speechRecognizer = ref new SpeechRecognizer();
     SpeechRecognitionListConstraint^ spConstraint = ref new SpeechRecognitionListConstraint(m_speechCommandList);
@@ -225,6 +226,9 @@ void HoliMoliMain::OnResultGenerated(SpeechContinuousRecognitionSession^ sender,
     }
     else
         m_waveBank->Play(1);
+
+    OutputDebugStringW(args->Result->Text->Data());
+    OutputDebugStringW(L"\n");
 }
 
 void HoliMoliMain::UnregisterHolographicEventHandlers()
